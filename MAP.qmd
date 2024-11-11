@@ -10,6 +10,7 @@ execute:
 ---
 
 ```{python}
+#| output: false
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -20,81 +21,216 @@ import folium
 import json
 import pandas as pd
 import xarray as xr
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from IPython.display import HTML  # Jupyter 환경에서 애니메이션을 시각화
+import numpy as np
+
+# URL에서 파일 읽기
+file_url = 'https://raw.githubusercontent.com/swany00/2024_CML/refs/heads/main/FAOSTAT_data_isocode_1991-2020.csv'
+geo_url = 'https://raw.githubusercontent.com/swany00/2024_CML/refs/heads/main/World_Countries__Generalized_.geojson'
+# GeoJSON 데이터 로드
+geo_data = json.loads(requests.get(geo_url).text)
+
+# 데이터 읽기
+df = pd.read_csv(file_url)
+
+# 필요한 열 선택
+tdf = df.iloc[:, [2, 9, 11]]
+
+# 지도 생성
+m = folium.Map(location=[0, -160], zoom_start=2,
+               max_bounds=True,
+               min_zoom=0,max_zoom=5, min_lat=-84, max_lat=84, min_lon=-175, max_lon=187)
+
+# Choropleth 지도 생성
+# Choropleth 객체를 변수에 할당
+choropleth_map = folium.Choropleth(
+    geo_data=geo_data,
+    data=tdf,
+    columns=['Area Code (ISO2)', 'Value'],
+    key_on='properties.ISO',  # geo_data의 ISO 속성에 매칭
+    highlight=True,
+    fill_color='RdYlGn',
+    fill_opacity=0.7,
+    line_opacity=0.5,
+    legend_name='곡물수확량'
+)
+
+# choropleth_map을 지도에 추가
+choropleth_map.add_to(m)
+
+
+# 툴팁 추가: 각 지역에 해당 값 표시
+for i in range(len(geo_data['features'])):
+    area_code = geo_data['features'][i]['properties']['ISO']
+    
+    # 전체 데이터의 평균값을 계산
+    avg_value = tdf[tdf['Area Code (ISO2)'] == area_code]['Value'].mean()
+    
+    # 툴팁 내용 설정 (예: 평균값만 표시)
+    tooltip_content = f'{area_code}: 평균 {avg_value:.2f}'
+    
+    # GeoJSON 데이터 객체
+    geo_json_str = geo_data['features'][i]
+    
+    # GeoJson 객체를 aa에 할당
+    aa = folium.GeoJson(
+        geo_json_str,
+        tooltip=folium.Tooltip(tooltip_content)  # 툴팁 객체 설정
+    )
+
+    # aa를 지도에 추가
+    aa.add_to(m)
+
+```
+
+# 첫장
+
+```{python}
+#| title: 2018~2019년도 전기사용량 (서울)
 
 pd.options.plotting.backend = "plotly"
 pio.templates.default = "plotly_white"
 
-global_dict = json.loads(requests.get('https://raw.githubusercontent.com/southkorea/southkorea-maps/master/kostat/2018/json/skorea-provinces-2018-geo.json').text)
-local_dict = json.loads(requests.get('https://raw.githubusercontent.com/southkorea/southkorea-maps/master/kostat/2018/json/skorea-municipalities-2018-geo.json').text)
-
 # combined_production_index 읽기
-com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.nc'
-com_product_idx = xr.open_dataset(com_product_idx)
-production_index = com_product_idx['production_index']
-prod_index_first_time = production_index.isel(time=0)
+com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
+com_product_idx = json.loads(requests.get(com_product_idx).text)
+production_index = com_product_idx['data_vars']
+production_index_values = list(production_index.values())[0]['data']
+production_index_values=np.array(production_index_values)
 
 # cwd 읽기
-cwd = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_cwd.nc'
-cwd = xr.open_dataset(cwd)
-cwd = cwd['average_cwd']
+cwd = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_cwd.json'
+cwd = json.loads(requests.get(cwd).text)
+cwd = cwd['data_vars']
+cwd = list(cwd.values())[0]['data']
+
+
 # cdd 읽기
-cdd = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_cdd.nc'
-cdd = xr.open_dataset(cdd)
-cdd = cdd['average_cdd']
+cdd = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_cdd.json'
+cdd = json.loads(requests.get(cdd).text)
+cdd = cdd['data_vars']
+cdd = list(cdd.values())[0]['data']
+
 
 # r95 읽기
-r95 = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_r95.nc'
-r95 = xr.open_dataset(r95)
-r95 = r95['average_r95']
+r95 = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_r95.json'
+r95 = json.loads(requests.get(r95).text)
+r95 = r95['data_vars']
+r95 = list(r95.values())[0]['data']
 
 # r99 읽기
-r99 = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_r99.nc'
-r99 = xr.open_dataset(r99)
-r99 = r99['average_r99']
+r99 = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_r99.json'
+r99 = json.loads(requests.get(r99).text)
+r99 = r99['data_vars']
+r99 = list(r99.values())[0]['data']
+
 
 # rx1day 읽기
-rx1day = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_rx1day.nc'
-rx1day = xr.open_dataset(rx1day)
-rx1day = rx1day['average_rx1day']
+rx1day = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_rx1day.json'
+rx1day = json.loads(requests.get(rx1day).text)
+rx1day = rx1day['data_vars']
+rx1day = list(rx1day.values())[0]['data']
 
 # rx5day 읽기
-rx5day = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_rx5day.nc'
-rx5day = xr.open_dataset(rx5day)
-rx5day = rx5day['average_rx5day']
+rx5day = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_rx5day.json'
+rx5day = json.loads(requests.get(rx5day).text)
+rx5day = rx5day['data_vars']
+rx5day = list(rx5day.values())[0]['data']
+
+
+for i in range(len(production_index_values)):
+    for lat in range(len(production_index_values[0].T[0])):
+        production_index_values[i].T[lat] = production_index_values[i].T[lat] - 3.1
+    for lon in range(len(production_index_values[0])):
+        production_index_values[i][lon] = production_index_values[i][lon] - 180
+
+# 새로운 플롯 생성 (3x2 그리드)
+fig, axs = plt.subplots(3, 2, figsize=(20, 15), constrained_layout=True)
+
+# 애니메이션 업데이트 함수
+def update(i):
+    # 각 인덱스를 해당 시간에 맞게 선택
+    production_index = production_index_values[i]
+    cwd_index = cwd[i]
+    cdd_index = cdd[i]
+    r95_index = r95[i]
+    r99_index = r99[i]
+    rx1day_index = rx1day[i]
+    rx5day_index = rx5day[i]
+
+    # 이전 플롯을 클리어하고, 새로운 데이터로 플롯
+    axs[0, 0].cla()
+    im1 = axs[0, 0].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
+    im2 = axs[0, 0].imshow(cwd_index, cmap='Blues', alpha=0.7, origin='lower')
+    axs[0, 0].set_title(f'Year {i + 1991} - Production Index vs CWD')
+
+    axs[0, 1].cla()
+    im3 = axs[0, 1].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
+    im4 = axs[0, 1].imshow(cdd_index, cmap='Reds', alpha=0.7, origin='lower')
+    axs[0, 1].set_title(f'Year {i + 1991} - Production Index vs CDD')
+
+    axs[1, 0].cla()
+    im5 = axs[1, 0].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
+    im6 = axs[1, 0].imshow(r95_index, cmap='Purples', alpha=0.7, origin='lower')
+    axs[1, 0].set_title(f'Year {i + 1991} - Production Index vs R95')
+
+    axs[1, 1].cla()
+    im7 = axs[1, 1].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
+    im8 = axs[1, 1].imshow(r99_index, cmap='Greens', alpha=0.7, origin='lower')
+    axs[1, 1].set_title(f'Year {i + 1991} - Production Index vs R99')
+
+    axs[2, 0].cla()
+    im9 = axs[2, 0].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
+    im10 = axs[2, 0].imshow(rx1day_index, cmap='Oranges', alpha=0.7, origin='lower')
+    axs[2, 0].set_title(f'Year {i + 1991} - Production Index vs RX1DAY')
+
+    axs[2, 1].cla()
+    im11 = axs[2, 1].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
+    im12 = axs[2, 1].imshow(rx5day_index, cmap='YlOrRd', alpha=0.7, origin='lower')
+    axs[2, 1].set_title(f'Year {i + 1991} - Production Index vs RX5DAY')
+
+    # 서브플롯 간의 간격을 줄이기
+    plt.subplots_adjust(hspace=1.5, wspace=0.8)
+
+    # 레이아웃을 자동으로 조정
+    plt.tight_layout()
+    # 각 축에 레이블 추가
+    for ax in axs.flat:
+        ax.set_xlabel('Longitude')
+        ax.set_ylabel('Latitude')
+
+# 애니메이션 생성
+ani = animation.FuncAnimation(fig, update, frames=30, interval=400)
+html_animation = ani.to_jshtml()
+html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="450" ')
+plt.close(fig)
+
+
+# 애니메이션을 HTML로 표시
+HTML(html_animation)
 
 
 
-#--#
-url = 'https://raw.githubusercontent.com/guebin/DV2022/main/posts/Energy/{}.csv'
-prov = ['Seoul', 'Busan', 'Daegu', 'Incheon', 
-        'Gwangju', 'Daejeon', 'Ulsan', 'Sejongsi', 
-        'Gyeonggi-do', 'Gangwon-do', 'Chungcheongbuk-do', 
-        'Chungcheongnam-do', 'Jeollabuk-do', 'Jeollanam-do', 
-        'Gyeongsangbuk-do', 'Gyeongsangnam-do', 'Jeju-do']
-df = pd.concat([pd.read_csv(url.format(p+y)).assign(년도=y, 시도=p) for p in prov for y in ['2018', '2019', '2020', '2021']]).reset_index(drop=True)\
-.assign(년도 = lambda df: df.년도.astype(int))\
-.set_index(['년도','시도','지역']).applymap(lambda x: int(str(x).replace(',','')))\
-.reset_index()
-df_global = pd.DataFrame([l['properties'] for l in global_dict['features']])
-df_local = pd.DataFrame([l['properties'] for l in local_dict['features']])
-df_json = df_local.set_index('name')\
-.rename(
-    {name:name.split('시')[-1] for name in df_local['name'] if ('시' in name) and ('구' in name) and (len(name)>3)}
-).reset_index()\
-.drop(['base_year','name_eng'],axis=1)\
-.rename({'name':'name_local','code':'code_local'},axis=1)\
-.assign(code = lambda df: df['code_local'].str[:2])\
-.merge(df_global.drop(['base_year','name_eng'],axis=1))
-df_left = df.assign(
-    시도 = lambda df: df.시도.map({l['properties']['name_eng']:l['properties']['name'] for l in global_dict['features']})
-).assign(on = lambda df: df.시도 + '-' + df.지역)
-df_right = df_json.assign(on = lambda df: df.name + '-' + df.name_local)\
-.drop(['name_local','name'],axis=1)
-df2 = df_left.merge(
-    df_right.set_index('on')\
-    .rename({'인천광역시-남구':'인천광역시-미추홀구'})\
-    .reset_index()
-).drop(['on'],axis=1)
+
+```
+
+# 데이터탐색
+
+```{python}
+#| title: 에너지사용량 자료 
+
+
+# 지도 출력
+m
+```
+
+# 시각화 {orientation="columns" scrolling="true"}
+
+## Column {width=50%}
+
+```{python}
 
 # CSV 파일 URL 경로 지정
 file_url = 'https://raw.githubusercontent.com/swany00/2024_CML/refs/heads/main/FAOSTAT_data_isocode_1991-2020.csv'
@@ -120,22 +256,6 @@ folium.Choropleth(geo_data = geo_data,
              fill_color = 'RdYlGn', fill_opacity = 0.7, line_opacity = 0.5,
              legend_name = '곡물수확량').add_to(m)
 
-
-```
-
-# 데이터탐색
-
-```{python}
-#| title: 에너지사용량 자료 
-import itables 
-itables.show(df2,showIndex=False)
-```
-
-# 시각화 {orientation="columns" scrolling="true"}
-
-## Column {width=50%}
-
-```{python}
 m
 ```
 

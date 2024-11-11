@@ -112,15 +112,128 @@ ul.task-list li input[type="checkbox"] {
 <div class="cell-output cell-output-error html-fill-item html-fill-container">
 <div class="ansi-escaped-output html-fill-item html-fill-container">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[1], line 7</span>
-<span class="ansi-green-fg ansi-bold">      5</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">json</span>
-<span class="ansi-green-fg ansi-bold">      6</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">requests</span>
-<span class="ansi-green-fg">----&gt; 7</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">folium</span>
-<span class="ansi-green-fg ansi-bold">      8</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">json</span>
-<span class="ansi-green-fg ansi-bold">      9</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">pandas</span> <span style="font-weight:bold;color:rgb(0,135,0)">as</span> <span style="font-weight:bold;color:rgb(0,0,255)">pd</span>
+<span class="ansi-red-fg">KeyError</span>                                  Traceback (most recent call last)
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/file_manager.py:211</span>, in <span class="ansi-cyan-fg">CachingFileManager._acquire_with_cache_info</span><span class="ansi-blue-fg">(self, needs_lock)</span>
+<span class="ansi-green-fg ansi-bold">    210</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 211</span>     file <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_cache</span><span class="ansi-yellow-bg">[</span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_key</span><span class="ansi-yellow-bg">]</span>
+<span class="ansi-green-fg ansi-bold">    212</span> <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">KeyError</span>:
 
-<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named 'folium'</pre>
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/lru_cache.py:56</span>, in <span class="ansi-cyan-fg">LRUCache.__getitem__</span><span class="ansi-blue-fg">(self, key)</span>
+<span class="ansi-green-fg ansi-bold">     55</span> <span style="font-weight:bold;color:rgb(0,135,0)">with</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_lock:
+<span class="ansi-green-fg">---&gt; 56</span>     value <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_cache</span><span class="ansi-yellow-bg">[</span><span class="ansi-yellow-bg">key</span><span class="ansi-yellow-bg">]</span>
+<span class="ansi-green-fg ansi-bold">     57</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_cache<span style="color:rgb(98,98,98)">.</span>move_to_end(key)
+
+<span class="ansi-red-fg">KeyError</span>: [&lt;class 'netCDF4._netCDF4.Dataset'&gt;, ('https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.nc',), 'r', (('clobber', True), ('diskless', False), ('format', 'NETCDF4'), ('persist', False)), 'bd5c0211-f4a5-49dc-8498-ff84684cc73c']
+
+During handling of the above exception, another exception occurred:
+
+<span class="ansi-red-fg">OSError</span>                                   Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[11], line 20</span>
+<span class="ansi-green-fg ansi-bold">     18</span> <span style="font-style:italic;color:rgb(95,135,135)"># combined_production_index 읽기</span>
+<span class="ansi-green-fg ansi-bold">     19</span> com_product_idx <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.nc</span><span style="color:rgb(175,0,0)">'</span>
+<span class="ansi-green-fg">---&gt; 20</span> com_product_idx <span style="color:rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">xr</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">open_dataset</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">com_product_idx</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">     21</span> production_index <span style="color:rgb(98,98,98)">=</span> com_product_idx[<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">production_index</span><span style="color:rgb(175,0,0)">'</span>]
+<span class="ansi-green-fg ansi-bold">     22</span> prod_index_first_time <span style="color:rgb(98,98,98)">=</span> production_index<span style="color:rgb(98,98,98)">.</span>isel(time<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">0</span>)
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/api.py:571</span>, in <span class="ansi-cyan-fg">open_dataset</span><span class="ansi-blue-fg">(filename_or_obj, engine, chunks, cache, decode_cf, mask_and_scale, decode_times, decode_timedelta, use_cftime, concat_characters, decode_coords, drop_variables, inline_array, chunked_array_type, from_array_kwargs, backend_kwargs, **kwargs)</span>
+<span class="ansi-green-fg ansi-bold">    559</span> decoders <span style="color:rgb(98,98,98)">=</span> _resolve_decoders_kwargs(
+<span class="ansi-green-fg ansi-bold">    560</span>     decode_cf,
+<span class="ansi-green-fg ansi-bold">    561</span>     open_backend_dataset_parameters<span style="color:rgb(98,98,98)">=</span>backend<span style="color:rgb(98,98,98)">.</span>open_dataset_parameters,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">    567</span>     decode_coords<span style="color:rgb(98,98,98)">=</span>decode_coords,
+<span class="ansi-green-fg ansi-bold">    568</span> )
+<span class="ansi-green-fg ansi-bold">    570</span> overwrite_encoded_chunks <span style="color:rgb(98,98,98)">=</span> kwargs<span style="color:rgb(98,98,98)">.</span>pop(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">overwrite_encoded_chunks</span><span style="color:rgb(175,0,0)">"</span>, <span style="font-weight:bold;color:rgb(0,135,0)">None</span>)
+<span class="ansi-green-fg">--&gt; 571</span> backend_ds <span style="color:rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">backend</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">open_dataset</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-fg ansi-bold">    572</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">filename_or_obj</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    573</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">drop_variables</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">drop_variables</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    574</span> <span class="ansi-yellow-bg">    </span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">decoders</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    575</span> <span class="ansi-yellow-bg">    </span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    576</span> <span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    577</span> ds <span style="color:rgb(98,98,98)">=</span> _dataset_from_backend_dataset(
+<span class="ansi-green-fg ansi-bold">    578</span>     backend_ds,
+<span class="ansi-green-fg ansi-bold">    579</span>     filename_or_obj,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">    589</span>     <span style="color:rgb(98,98,98)">*</span><span style="color:rgb(98,98,98)">*</span>kwargs,
+<span class="ansi-green-fg ansi-bold">    590</span> )
+<span class="ansi-green-fg ansi-bold">    591</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> ds
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/netCDF4_.py:645</span>, in <span class="ansi-cyan-fg">NetCDF4BackendEntrypoint.open_dataset</span><span class="ansi-blue-fg">(self, filename_or_obj, mask_and_scale, decode_times, concat_characters, decode_coords, drop_variables, use_cftime, decode_timedelta, group, mode, format, clobber, diskless, persist, lock, autoclose)</span>
+<span class="ansi-green-fg ansi-bold">    624</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">open_dataset</span>(  <span style="font-style:italic;color:rgb(95,135,135)"># type: ignore[override]  # allow LSP violation, not supporting **kwargs</span>
+<span class="ansi-green-fg ansi-bold">    625</span>     <span style="color:rgb(0,135,0)">self</span>,
+<span class="ansi-green-fg ansi-bold">    626</span>     filename_or_obj: <span style="color:rgb(0,135,0)">str</span> <span style="color:rgb(98,98,98)">|</span> os<span style="color:rgb(98,98,98)">.</span>PathLike[Any] <span style="color:rgb(98,98,98)">|</span> BufferedIOBase <span style="color:rgb(98,98,98)">|</span> AbstractDataStore,
+<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg ansi-bold">    642</span>     autoclose<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">False</span>,
+<span class="ansi-green-fg ansi-bold">    643</span> ) <span style="color:rgb(98,98,98)">-</span><span style="color:rgb(98,98,98)">&gt;</span> Dataset:
+<span class="ansi-green-fg ansi-bold">    644</span>     filename_or_obj <span style="color:rgb(98,98,98)">=</span> _normalize_path(filename_or_obj)
+<span class="ansi-green-fg">--&gt; 645</span>     store <span style="color:rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">NetCDF4DataStore</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">open</span><span class="ansi-yellow-bg">(</span>
+<span class="ansi-green-fg ansi-bold">    646</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">filename_or_obj</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    647</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">mode</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    648</span> <span class="ansi-yellow-bg">        </span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">format</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">format</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    649</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">group</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">group</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    650</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">clobber</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">clobber</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    651</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">diskless</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">diskless</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    652</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">persist</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">persist</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    653</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">lock</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">lock</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    654</span> <span class="ansi-yellow-bg">        </span><span class="ansi-yellow-bg">autoclose</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">autoclose</span><span class="ansi-yellow-bg">,</span>
+<span class="ansi-green-fg ansi-bold">    655</span> <span class="ansi-yellow-bg">    </span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    657</span>     store_entrypoint <span style="color:rgb(98,98,98)">=</span> StoreBackendEntrypoint()
+<span class="ansi-green-fg ansi-bold">    658</span>     <span style="font-weight:bold;color:rgb(0,135,0)">with</span> close_on_error(store):
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/netCDF4_.py:408</span>, in <span class="ansi-cyan-fg">NetCDF4DataStore.open</span><span class="ansi-blue-fg">(cls, filename, mode, format, group, clobber, diskless, persist, lock, lock_maker, autoclose)</span>
+<span class="ansi-green-fg ansi-bold">    402</span> kwargs <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">dict</span>(
+<span class="ansi-green-fg ansi-bold">    403</span>     clobber<span style="color:rgb(98,98,98)">=</span>clobber, diskless<span style="color:rgb(98,98,98)">=</span>diskless, persist<span style="color:rgb(98,98,98)">=</span>persist, <span style="color:rgb(0,135,0)">format</span><span style="color:rgb(98,98,98)">=</span><span style="color:rgb(0,135,0)">format</span>
+<span class="ansi-green-fg ansi-bold">    404</span> )
+<span class="ansi-green-fg ansi-bold">    405</span> manager <span style="color:rgb(98,98,98)">=</span> CachingFileManager(
+<span class="ansi-green-fg ansi-bold">    406</span>     netCDF4<span style="color:rgb(98,98,98)">.</span>Dataset, filename, mode<span style="color:rgb(98,98,98)">=</span>mode, kwargs<span style="color:rgb(98,98,98)">=</span>kwargs
+<span class="ansi-green-fg ansi-bold">    407</span> )
+<span class="ansi-green-fg">--&gt; 408</span> <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">cls</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">manager</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">group</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">group</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">mode</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">mode</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">lock</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">lock</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span class="ansi-yellow-bg">autoclose</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">=</span><span class="ansi-yellow-bg">autoclose</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/netCDF4_.py:355</span>, in <span class="ansi-cyan-fg">NetCDF4DataStore.__init__</span><span class="ansi-blue-fg">(self, manager, group, mode, lock, autoclose)</span>
+<span class="ansi-green-fg ansi-bold">    353</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_group <span style="color:rgb(98,98,98)">=</span> group
+<span class="ansi-green-fg ansi-bold">    354</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_mode <span style="color:rgb(98,98,98)">=</span> mode
+<span class="ansi-green-fg">--&gt; 355</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>format <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">ds</span><span style="color:rgb(98,98,98)">.</span>data_model
+<span class="ansi-green-fg ansi-bold">    356</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_filename <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>ds<span style="color:rgb(98,98,98)">.</span>filepath()
+<span class="ansi-green-fg ansi-bold">    357</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>is_remote <span style="color:rgb(98,98,98)">=</span> is_remote_uri(<span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_filename)
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/netCDF4_.py:417</span>, in <span class="ansi-cyan-fg">NetCDF4DataStore.ds</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">    415</span> <span style="color:rgb(175,0,255)">@property</span>
+<span class="ansi-green-fg ansi-bold">    416</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">ds</span>(<span style="color:rgb(0,135,0)">self</span>):
+<span class="ansi-green-fg">--&gt; 417</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_acquire</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">)</span>
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/netCDF4_.py:411</span>, in <span class="ansi-cyan-fg">NetCDF4DataStore._acquire</span><span class="ansi-blue-fg">(self, needs_lock)</span>
+<span class="ansi-green-fg ansi-bold">    410</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">_acquire</span>(<span style="color:rgb(0,135,0)">self</span>, needs_lock<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>):
+<span class="ansi-green-fg">--&gt; 411</span>     <span style="font-weight:bold;color:rgb(0,135,0)">with</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_manager<span style="color:rgb(98,98,98)">.</span>acquire_context(needs_lock) <span style="font-weight:bold;color:rgb(0,135,0)">as</span> root:
+<span class="ansi-green-fg ansi-bold">    412</span>         ds <span style="color:rgb(98,98,98)">=</span> _nc4_require_group(root, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_group, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_mode)
+<span class="ansi-green-fg ansi-bold">    413</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> ds
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/contextlib.py:135</span>, in <span class="ansi-cyan-fg">_GeneratorContextManager.__enter__</span><span class="ansi-blue-fg">(self)</span>
+<span class="ansi-green-fg ansi-bold">    133</span> <span style="font-weight:bold;color:rgb(0,135,0)">del</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>args, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>kwds, <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>func
+<span class="ansi-green-fg ansi-bold">    134</span> <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg">--&gt; 135</span>     <span style="font-weight:bold;color:rgb(0,135,0)">return</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">next</span><span class="ansi-yellow-bg">(</span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">gen</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    136</span> <span style="font-weight:bold;color:rgb(0,135,0)">except</span> <span style="font-weight:bold;color:rgb(215,95,95)">StopIteration</span>:
+<span class="ansi-green-fg ansi-bold">    137</span>     <span style="font-weight:bold;color:rgb(0,135,0)">raise</span> <span style="font-weight:bold;color:rgb(215,95,95)">RuntimeError</span>(<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">generator didn</span><span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">t yield</span><span style="color:rgb(175,0,0)">"</span>) <span style="font-weight:bold;color:rgb(0,135,0)">from</span> <span style="font-weight:bold;color:rgb(0,135,0)">None</span>
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/file_manager.py:199</span>, in <span class="ansi-cyan-fg">CachingFileManager.acquire_context</span><span class="ansi-blue-fg">(self, needs_lock)</span>
+<span class="ansi-green-fg ansi-bold">    196</span> <span style="color:rgb(175,0,255)">@contextlib</span><span style="color:rgb(98,98,98)">.</span>contextmanager
+<span class="ansi-green-fg ansi-bold">    197</span> <span style="font-weight:bold;color:rgb(0,135,0)">def</span> <span style="color:rgb(0,0,255)">acquire_context</span>(<span style="color:rgb(0,135,0)">self</span>, needs_lock<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">True</span>):
+<span class="ansi-green-fg ansi-bold">    198</span> <span style="color:rgb(188,188,188)">    </span><span style="font-style:italic;color:rgb(175,0,0)">"""Context manager for acquiring a file."""</span>
+<span class="ansi-green-fg">--&gt; 199</span>     file, cached <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_acquire_with_cache_info</span><span class="ansi-yellow-bg">(</span><span class="ansi-yellow-bg">needs_lock</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    200</span>     <span style="font-weight:bold;color:rgb(0,135,0)">try</span>:
+<span class="ansi-green-fg ansi-bold">    201</span>         <span style="font-weight:bold;color:rgb(0,135,0)">yield</span> file
+
+File <span class="ansi-green-fg">~/anaconda3/envs/gd/lib/python3.10/site-packages/xarray/backends/file_manager.py:217</span>, in <span class="ansi-cyan-fg">CachingFileManager._acquire_with_cache_info</span><span class="ansi-blue-fg">(self, needs_lock)</span>
+<span class="ansi-green-fg ansi-bold">    215</span>     kwargs <span style="color:rgb(98,98,98)">=</span> kwargs<span style="color:rgb(98,98,98)">.</span>copy()
+<span class="ansi-green-fg ansi-bold">    216</span>     kwargs[<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">mode</span><span style="color:rgb(175,0,0)">"</span>] <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_mode
+<span class="ansi-green-fg">--&gt; 217</span> file <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_opener</span><span class="ansi-yellow-bg">(</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span style="color:rgb(0,135,0)" class="ansi-yellow-bg">self</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">.</span><span class="ansi-yellow-bg">_args</span><span class="ansi-yellow-bg">,</span><span class="ansi-yellow-bg"> </span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span style="color:rgb(98,98,98)" class="ansi-yellow-bg">*</span><span class="ansi-yellow-bg">kwargs</span><span class="ansi-yellow-bg">)</span>
+<span class="ansi-green-fg ansi-bold">    218</span> <span style="font-weight:bold;color:rgb(0,135,0)">if</span> <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_mode <span style="color:rgb(98,98,98)">==</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">w</span><span style="color:rgb(175,0,0)">"</span>:
+<span class="ansi-green-fg ansi-bold">    219</span>     <span style="font-style:italic;color:rgb(95,135,135)"># ensure file doesn't get overridden when opened again</span>
+<span class="ansi-green-fg ansi-bold">    220</span>     <span style="color:rgb(0,135,0)">self</span><span style="color:rgb(98,98,98)">.</span>_mode <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">a</span><span style="color:rgb(175,0,0)">"</span>
+
+File <span class="ansi-green-fg">src/netCDF4/_netCDF4.pyx:2470</span>, in <span class="ansi-cyan-fg">netCDF4._netCDF4.Dataset.__init__</span><span class="ansi-blue-fg">()</span>
+
+File <span class="ansi-green-fg">src/netCDF4/_netCDF4.pyx:2107</span>, in <span class="ansi-cyan-fg">netCDF4._netCDF4._ensure_nc_success</span><span class="ansi-blue-fg">()</span>
+
+<span class="ansi-red-fg">OSError</span>: [Errno -90] NetCDF: file not found: 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.nc'</pre>
 </div>
 </div>
 </div>
@@ -138,12 +251,12 @@ Cell <span class="ansi-green-fg">In[1], line 7</span>
 <div class="cell-output cell-output-error html-fill-item html-fill-container">
 <div class="ansi-escaped-output html-fill-item html-fill-container">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[2], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">itables</span> 
-<span class="ansi-green-fg ansi-bold">      2</span> itables<span style="color:rgb(98,98,98)">.</span>show(df2,showIndex<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">False</span>)
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+Cell <span class="ansi-green-fg">In[12], line 2</span>
+<span class="ansi-green-fg ansi-bold">      1</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> <span style="font-weight:bold;color:rgb(0,0,255)">itables</span> 
+<span class="ansi-green-fg">----&gt; 2</span> itables<span style="color:rgb(98,98,98)">.</span>show(<span class="ansi-yellow-bg">df2</span>,showIndex<span style="color:rgb(98,98,98)">=</span><span style="font-weight:bold;color:rgb(0,135,0)">False</span>)
 
-<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named 'itables'</pre>
+<span class="ansi-red-fg">NameError</span>: name 'df2' is not defined</pre>
 </div>
 </div>
 </div>
@@ -155,7 +268,7 @@ Cell <span class="ansi-green-fg">In[2], line 1</span>
 </bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
 </div>
 </div>
-<div id="시각화" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="columns" data-scrolling="true" aria-labelledby="tab-시각화">
+<div id="시각화" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-scrolling="true" data-orientation="columns" aria-labelledby="tab-시각화">
 <div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 50fr) minmax(3em, 50fr);
 grid-auto-rows: minmax(0, 1fr);">
 <div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
@@ -165,8 +278,8 @@ grid-auto-rows: minmax(0, 1fr);">
 <div class="ansi-escaped-output html-fill-item html-fill-container">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[3], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> m
+Cell <span class="ansi-green-fg">In[13], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> <span class="ansi-yellow-bg">m</span>
 
 <span class="ansi-red-fg">NameError</span>: name 'm' is not defined</pre>
 </div>
@@ -186,17 +299,26 @@ Cell <span class="ansi-green-fg">In[3], line 1</span>
 <div class="ansi-escaped-output html-fill-item html-fill-container">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[4], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> seoul_dict <span style="color:rgb(98,98,98)">=</span> local_dict<span style="color:rgb(98,98,98)">.</span>copy() 
+Cell <span class="ansi-green-fg">In[14], line 6</span>
+<span class="ansi-green-fg ansi-bold">      1</span> seoul_dict <span style="color:rgb(98,98,98)">=</span> local_dict<span style="color:rgb(98,98,98)">.</span>copy() 
 <span class="ansi-green-fg ansi-bold">      2</span> seoul_dict[<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">features</span><span style="color:rgb(175,0,0)">'</span>] <span style="color:rgb(98,98,98)">=</span> [l <span style="font-weight:bold;color:rgb(0,135,0)">for</span> l <span style="font-weight:bold;color:rgb(175,0,255)">in</span> seoul_dict[<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">features</span><span style="color:rgb(175,0,0)">'</span>] <span style="font-weight:bold;color:rgb(0,135,0)">if</span> l[<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">properties</span><span style="color:rgb(175,0,0)">'</span>][<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">code</span><span style="color:rgb(175,0,0)">'</span>][:<span style="color:rgb(98,98,98)">2</span>] <span style="color:rgb(98,98,98)">==</span> <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">11</span><span style="color:rgb(175,0,0)">'</span>]
 <span class="ansi-green-fg ansi-bold">      3</span> fig <span style="color:rgb(98,98,98)">=</span> px<span style="color:rgb(98,98,98)">.</span>choropleth_mapbox(
 <span class="ansi-green-fg ansi-bold">      4</span>     geojson <span style="color:rgb(98,98,98)">=</span> seoul_dict,
 <span class="ansi-green-fg ansi-bold">      5</span>     featureidkey <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">properties.code</span><span style="color:rgb(175,0,0)">'</span>,
-<span class="ansi-green-fg">   (...)</span>
+<span class="ansi-green-fg">----&gt; 6</span>     data_frame <span style="color:rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">df2</span>,
+<span class="ansi-green-fg ansi-bold">      7</span>     locations <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">code_local</span><span style="color:rgb(175,0,0)">'</span>,
+<span class="ansi-green-fg ansi-bold">      8</span>     color <span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">에너지사용량(TOE)/전기</span><span style="color:rgb(175,0,0)">'</span>,
+<span class="ansi-green-fg ansi-bold">      9</span>     animation_frame<span style="color:rgb(98,98,98)">=</span> <span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">년도</span><span style="color:rgb(175,0,0)">'</span>,
+<span class="ansi-green-fg ansi-bold">     10</span>     hover_data <span style="color:rgb(98,98,98)">=</span> [<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">시도</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">지역</span><span style="color:rgb(175,0,0)">'</span>],
+<span class="ansi-green-fg ansi-bold">     11</span>     <span style="font-style:italic;color:rgb(95,135,135)">#---#</span>
+<span class="ansi-green-fg ansi-bold">     12</span>     mapbox_style<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">carto-positron</span><span style="color:rgb(175,0,0)">"</span>,
+<span class="ansi-green-fg ansi-bold">     13</span>     range_color <span style="color:rgb(98,98,98)">=</span> [<span style="color:rgb(98,98,98)">0</span>,<span style="color:rgb(98,98,98)">400000</span>],
+<span class="ansi-green-fg ansi-bold">     14</span>     center<span style="color:rgb(98,98,98)">=</span>{<span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">lat</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(98,98,98)">37.5642135</span>, <span style="color:rgb(175,0,0)">"</span><span style="color:rgb(175,0,0)">lon</span><span style="color:rgb(175,0,0)">"</span>: <span style="color:rgb(98,98,98)">127.0016985</span>},
 <span class="ansi-green-fg ansi-bold">     15</span>     zoom<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">9</span>,
 <span class="ansi-green-fg ansi-bold">     16</span> )
+<span class="ansi-green-fg ansi-bold">     17</span> fig<span style="color:rgb(98,98,98)">.</span>show(config<span style="color:rgb(98,98,98)">=</span>{<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">scrollZoom</span><span style="color:rgb(175,0,0)">'</span>:<span style="font-weight:bold;color:rgb(0,135,0)">False</span>})
 
-<span class="ansi-red-fg">NameError</span>: name 'local_dict' is not defined</pre>
+<span class="ansi-red-fg">NameError</span>: name 'df2' is not defined</pre>
 </div>
 </div>
 </div>
@@ -213,8 +335,8 @@ Cell <span class="ansi-green-fg">In[4], line 1</span>
 <div class="ansi-escaped-output html-fill-item html-fill-container">
 <pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
 <span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-Cell <span class="ansi-green-fg">In[5], line 1</span>
-<span class="ansi-green-fg">----&gt; 1</span> fig <span style="color:rgb(98,98,98)">=</span> df2<span style="color:rgb(98,98,98)">.</span>drop([<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">code_local</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">code</span><span style="color:rgb(175,0,0)">'</span>],axis<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">1</span>)\
+Cell <span class="ansi-green-fg">In[15], line 1</span>
+<span class="ansi-green-fg">----&gt; 1</span> fig <span style="color:rgb(98,98,98)">=</span> <span class="ansi-yellow-bg">df2</span><span style="color:rgb(98,98,98)">.</span>drop([<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">code_local</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">code</span><span style="color:rgb(175,0,0)">'</span>],axis<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">1</span>)\
 <span class="ansi-green-fg ansi-bold">      2</span> <span style="color:rgb(98,98,98)">.</span>set_index([<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">년도</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">시도</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">지역</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">건물동수</span><span style="color:rgb(175,0,0)">'</span>,<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">연면적</span><span style="color:rgb(175,0,0)">'</span>])<span style="color:rgb(98,98,98)">.</span>stack()<span style="color:rgb(98,98,98)">.</span>reset_index()\
 <span class="ansi-green-fg ansi-bold">      3</span> <span style="color:rgb(98,98,98)">.</span>rename({<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">level_5</span><span style="color:rgb(175,0,0)">'</span>:<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">에너지종류</span><span style="color:rgb(175,0,0)">'</span>, <span style="color:rgb(98,98,98)">0</span>:<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">에너지사용량</span><span style="color:rgb(175,0,0)">'</span>},axis<span style="color:rgb(98,98,98)">=</span><span style="color:rgb(98,98,98)">1</span>)\
 <span class="ansi-green-fg ansi-bold">      4</span> <span style="color:rgb(98,98,98)">.</span>assign(에너지종류 <span style="color:rgb(98,98,98)">=</span> <span style="font-weight:bold;color:rgb(0,135,0)">lambda</span> df: df[<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">에너지종류</span><span style="color:rgb(175,0,0)">'</span>]<span style="color:rgb(98,98,98)">.</span>str<span style="color:rgb(98,98,98)">.</span>split(<span style="color:rgb(175,0,0)">'</span><span style="color:rgb(175,0,0)">/</span><span style="color:rgb(175,0,0)">'</span>)<span style="color:rgb(98,98,98)">.</span>str[<span style="color:rgb(98,98,98)">-</span><span style="color:rgb(98,98,98)">1</span>])\

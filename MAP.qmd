@@ -1,6 +1,6 @@
 ---
-title: "에너지사용량 자료 분석"
-author: "본인이름~"
+title: "극한강수에 따른 피해량 분석"
+author: "기후논문반"
 format: dashboard
 execute: 
   enabled: true
@@ -39,9 +39,9 @@ df = pd.read_csv(file_url)
 tdf = df.iloc[:, [2, 9, 11]]
 
 # 지도 생성
-m = folium.Map(location=[0, -160], zoom_start=2,
+m = folium.Map(location=[0, -160], zoom_start=1,
                max_bounds=True,
-               min_zoom=0,max_zoom=5, min_lat=-84, max_lat=84, min_lon=-175, max_lon=187)
+               min_zoom=1,max_zoom=5, min_lat=-84, max_lat=84, min_lon=-175, max_lon=187)
 
 # Choropleth 지도 생성
 # Choropleth 객체를 변수에 할당
@@ -54,7 +54,7 @@ choropleth_map = folium.Choropleth(
     fill_color='RdYlGn',
     fill_opacity=0.7,
     line_opacity=0.5,
-    legend_name='곡물수확량'
+    legend_name='국가별 농업 총 생산지수'
 )
 
 # choropleth_map을 지도에 추가
@@ -85,10 +85,85 @@ for i in range(len(geo_data['features'])):
 
 ```
 
-# 첫장
+# 극한강수지수 및 가뭄지수
 
 ```{python}
-#| title: 2018~2019년도 전기사용량 (서울)
+#| title: 극한강수지수 및 가뭄지수
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import xarray as xr
+from IPython.display import HTML
+
+# 파일 경로 설정
+file_path_r95 = '/root/notenotenote/r95_era5_1991-2020.nc'
+file_path_r99 = '/root/notenotenote/r99_era5_1991-2020.nc'
+file_path_rx1day = '/root/notenotenote/rx1day_era5_1991-2020.nc'
+file_path_rx5day = '/root/notenotenote/rx5day_era5_1991-2020.nc'
+file_path_cwd = '/root/notenotenote/cwd_era5_1991-2020.nc'
+file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'
+
+# 데이터 로드
+r95 = xr.open_dataset(file_path_r95, decode_times=False)['r95'].values
+r99 = xr.open_dataset(file_path_r99, decode_times=False)['r99'].values
+rx1day = xr.open_dataset(file_path_rx1day, decode_times=False)['rx1day'].values
+rx5day = xr.open_dataset(file_path_rx5day, decode_times=False)['rx5day'].values
+cwd = xr.open_dataset(file_path_cwd, decode_times=False)['cwd'].values
+cdd = xr.open_dataset(file_path_cdd, decode_times=False)['cdd'].values
+
+# 데이터셋의 시간, 위도, 경도 차원 확인 (시간 차원은 첫 번째 차원)
+time_len, lat_len, lon_len = r95.shape  # r95와 다른 데이터들이 동일한 shape을 가질 것으로 가정
+
+# 시각화 설정
+fig, axes = plt.subplots(2, 3, figsize=(10, 6), dpi=80)  # 2행 3열로 서브플롯 설정
+
+# 데이터셋과 이름을 매칭하는 리스트
+data_list = [r95, r99, rx1day, rx5day, cwd, cdd]
+titles = ['r95', 'r99', 'rx1day', 'rx5day', 'cwd', 'cdd']
+
+# 각 서브플롯에 대한 초기화
+caxs = []
+for ax, data, title in zip(axes.flat, data_list, titles):
+    cax = ax.imshow(data[0], cmap='coolwarm', animated=True)
+    ax.set_title(f"{title} at Time: 0")
+    ax.axis('off')  # 축을 보이지 않게 설정
+    caxs.append(cax)
+
+# 컬러바 추가
+for i, ax in enumerate(axes.flat):
+    fig.colorbar(caxs[i], ax=ax, orientation='vertical', label='Value')
+
+# 타이틀 설정
+fig.suptitle("Climate Data Over Time", fontsize=16)
+
+# 프레임 업데이트 함수 정의
+def update_frame(frame):
+    # 각 시간 프레임에서 데이터를 업데이트
+    for i, (ax, data, title) in enumerate(zip(axes.flat, data_list, titles)):
+        caxs[i].set_array(data[frame])  # 각 데이터셋에 대한 시각화를 업데이트
+        ax.set_title(f"{title} at YEAR: {1991+frame}")  # 타이틀 업데이트
+    return caxs
+
+# 애니메이션 생성
+ani = animation.FuncAnimation(fig, update_frame, frames=range(time_len), interval=100, blit=True)
+
+# HTML로 애니메이션을 저장
+html_animation = ani.to_jshtml()
+html_animation = html_animation.replace('<video ', '<video autoplay loop width="800" height="600" ')
+
+# 플롯 닫기
+plt.close(fig)
+
+# HTML로 애니메이션 표시
+HTML(html_animation)
+
+
+```
+
+# 극한강수인덱스
+
+```{python}
+#| title: 극한강수인덱스
 
 pd.options.plotting.backend = "plotly"
 pio.templates.default = "plotly_white"
@@ -149,156 +224,201 @@ for i in range(len(production_index_values)):
 # 새로운 플롯 생성 (3x2 그리드)
 fig, axs = plt.subplots(3, 2, figsize=(20, 15), constrained_layout=True)
 
+# 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
+im2 = axs[0, 0].imshow(cwd[0], cmap='Blues', alpha=1, origin='lower')
+fig.colorbar(im2, ax=axs[0, 0])
+
+im4 = axs[0, 1].imshow(cdd[0], cmap='Reds', alpha=1, origin='lower')
+fig.colorbar(im4, ax=axs[0, 1])
+
+im6 = axs[1, 0].imshow(r95[0], cmap='Purples', alpha=1, origin='lower')
+fig.colorbar(im6, ax=axs[1, 0])
+
+im8 = axs[1, 1].imshow(r99[0], cmap='Greens', alpha=1, origin='lower')
+fig.colorbar(im8, ax=axs[1, 1])
+
+im10 = axs[2, 0].imshow(rx1day[0], cmap='Oranges', alpha=1, origin='lower')
+fig.colorbar(im10, ax=axs[2, 0])
+
+im12 = axs[2, 1].imshow(rx5day[0], cmap='YlOrRd', alpha=1, origin='lower')
+fig.colorbar(im12, ax=axs[2, 1])
+
+
+
 # 애니메이션 업데이트 함수
 def update(i):
     # 각 인덱스를 해당 시간에 맞게 선택
-    production_index = production_index_values[i]
-    cwd_index = cwd[i]
-    cdd_index = cdd[i]
-    r95_index = r95[i]
-    r99_index = r99[i]
-    rx1day_index = rx1day[i]
-    rx5day_index = rx5day[i]
+    im2.set_data(cwd[i])
+    axs[0, 0].set_title(f'Year {i + 1991} - CWD')
 
-    # 이전 플롯을 클리어하고, 새로운 데이터로 플롯
-    axs[0, 0].cla()
-    im1 = axs[0, 0].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
-    im2 = axs[0, 0].imshow(cwd_index, cmap='Blues', alpha=0.7, origin='lower')
-    axs[0, 0].set_title(f'Year {i + 1991} - Production Index vs CWD')
+    im4.set_data(cdd[i])
+    axs[0, 1].set_title(f'Year {i + 1991} - CDD')
 
-    axs[0, 1].cla()
-    im3 = axs[0, 1].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
-    im4 = axs[0, 1].imshow(cdd_index, cmap='Reds', alpha=0.7, origin='lower')
-    axs[0, 1].set_title(f'Year {i + 1991} - Production Index vs CDD')
+    im6.set_data(r95[i])
+    axs[1, 0].set_title(f'Year {i + 1991} - R95')
 
-    axs[1, 0].cla()
-    im5 = axs[1, 0].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
-    im6 = axs[1, 0].imshow(r95_index, cmap='Purples', alpha=0.7, origin='lower')
-    axs[1, 0].set_title(f'Year {i + 1991} - Production Index vs R95')
+    im8.set_data(r99[i])
+    axs[1, 1].set_title(f'Year {i + 1991} - R99')
 
-    axs[1, 1].cla()
-    im7 = axs[1, 1].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
-    im8 = axs[1, 1].imshow(r99_index, cmap='Greens', alpha=0.7, origin='lower')
-    axs[1, 1].set_title(f'Year {i + 1991} - Production Index vs R99')
+    im10.set_data(rx1day[i])
+    axs[2, 0].set_title(f'Year {i + 1991} - RX1DAY')
 
-    axs[2, 0].cla()
-    im9 = axs[2, 0].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
-    im10 = axs[2, 0].imshow(rx1day_index, cmap='Oranges', alpha=0.7, origin='lower')
-    axs[2, 0].set_title(f'Year {i + 1991} - Production Index vs RX1DAY')
+    im12.set_data(rx5day[i])
+    axs[2, 1].set_title(f'Year {i + 1991} - RX5DAY')
 
-    axs[2, 1].cla()
-    im11 = axs[2, 1].imshow(production_index, cmap='YlGnBu', alpha=0.7, origin='lower')
-    im12 = axs[2, 1].imshow(rx5day_index, cmap='YlOrRd', alpha=0.7, origin='lower')
-    axs[2, 1].set_title(f'Year {i + 1991} - Production Index vs RX5DAY')
-
-    # 서브플롯 간의 간격을 줄이기
-    plt.subplots_adjust(hspace=1.5, wspace=0.8)
-
-    # 레이아웃을 자동으로 조정
-    plt.tight_layout()
-    # 각 축에 레이블 추가
     for ax in axs.flat:
-        ax.set_xlabel('Longitude')
-        ax.set_ylabel('Latitude')
-
+        ax.set_xticks([])  # x축 눈금 없애기
+        ax.set_yticks([])  # y축 눈금 없애기
+        
 # 애니메이션 생성
 ani = animation.FuncAnimation(fig, update, frames=30, interval=400)
 html_animation = ani.to_jshtml()
-html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="450" ')
+html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="400" ')
 plt.close(fig)
-
 
 # 애니메이션을 HTML로 표시
 HTML(html_animation)
 
+```
 
 
+# 피해지수 데이터
+
+```{python}
+#| title: 피해량 인덱스
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.animation as animation
+from IPython.display import HTML
+
+# 새로운 플롯 생성 (1x1 그리드)
+fig, axs = plt.subplots(1, 1, figsize=(20, 15), constrained_layout=True)
+
+# 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
+im11 = axs.imshow(production_index_values[0], cmap='YlGnBu', alpha=1, origin='lower')
+fig.colorbar(im11, ax=axs)
+axs.set_xticks()  # x축 눈금 없애기
+axs.set_yticks()  # y축 눈금 없애기
+
+# 애니메이션 업데이트 함수
+def update(i):
+    im11.set_data(production_index_values[i])  # 프레임에 맞는 데이터로 업데이트
+    axs.set_title(f'Year {i + 1991} - Production Index', fontsize=24)  # 제목 업데이트
+
+# 애니메이션 생성
+ani = animation.FuncAnimation(fig, update, frames=len(production_index_values), interval=400)
+
+# 애니메이션을 HTML로 변환하여 표시
+html_animation = ani.to_jshtml()
+html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="450" ')
+
+plt.close(fig)
+
+# 애니메이션을 HTML로 표시
+HTML(html_animation)
 
 ```
 
-# 데이터탐색
+# 회귀 분석
 
 ```{python}
-#| title: 에너지사용량 자료 
+#| title: 회귀 분석 결과 시각화
+import numpy as np
+import xarray as xr
+import json
+import requests
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# 데이터 가져오기
+com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
+com_product_idx = json.loads(requests.get(com_product_idx).text)
+production_index = com_product_idx['data_vars']
+production_index_values = list(production_index.values())[0]['data']
+production_index_values = np.array(production_index_values)
+
+# NetCDF 파일 로드 (r95, r99, rx1day, rx5day, cwd, cdd)
+file_paths = {
+    'r95': '/root/notenotenote/r95_era5_1991-2020.nc',
+    'r99': '/root/notenotenote/r99_era5_1991-2020.nc',
+    'rx1day': '/root/notenotenote/rx1day_era5_1991-2020.nc',
+    'rx5day': '/root/notenotenote/rx5day_era5_1991-2020.nc',
+    'cwd': '/root/notenotenote/cwd_era5_1991-2020.nc',
+    'cdd': '/root/notenotenote/cdd_era5_1991-2020.nc'
+}
+
+climate_variables = {}
+
+for var, path in file_paths.items():
+    climate_variables[var] = xr.open_dataset(path, decode_times=False)[var].values
+
+# 데이터 차원 확인
+print("production_index_values shape:", production_index_values.shape)
+for var in climate_variables:
+    print(f"{var} shape:", climate_variables[var].shape)
+
+# assumption: production_index_values and climate data are of shape (time, lat, lon)
+time_len, lat_len, lon_len = production_index_values.shape
+
+# 회귀 분석 결과 저장할 배열 초기화
+slope_dict = {var: np.full((lat_len, lon_len), np.nan) for var in climate_variables}
+
+# 회귀 분석 수행
+for lat in range(lat_len):
+    for lon in range(lon_len):
+        # 유효한 값 찾기 (NaN이 아닌 값들만)
+        valid_mask = ~np.isnan(production_index_values[:, lat, lon])
+        
+        # 각 기후 변수에 대해 유효한 데이터만 추출
+        valid_production_index_values = production_index_values[valid_mask, lat, lon]
+        
+        for var, data in climate_variables.items():
+            valid_climate_data = data[valid_mask, lat, lon]
+            
+            if len(valid_climate_data) > 1:  # 최소 2개의 유효 데이터가 있어야 회귀 분석 가능
+                # 회귀 분석
+                model = LinearRegression()
+                model.fit(valid_climate_data.reshape(-1, 1), valid_production_index_values)  # 2D로 reshape
+                
+                # 기울기 저장
+                slope_dict[var][lat, lon] = model.coef_[0]
+
+# 회귀 분석 결과 시각화
+plt.figure(figsize=(15, 10))
+
+# 각 기후 변수의 기울기 시각화
+for i, (var, slope) in enumerate(slope_dict.items(), start=1):
+    plt.subplot(2, 3, i)
+    plt.imshow(slope, cmap='coolwarm', origin='lower', interpolation='nearest')
+    plt.colorbar(label=f"Slope (Production Index vs {var})")
+    plt.title(f"Slope ({var})")
+    plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+```
+
+# 참고자료 시각화
+
+```{python}
+#| title: 2015년 기준 국가별 농업 총 생산지수 
 
 
 # 지도 출력
 m
 ```
 
-# 시각화 {orientation="columns" scrolling="true"}
-
-## Column {width=50%}
-
-```{python}
-
-# CSV 파일 URL 경로 지정
-file_url = 'https://raw.githubusercontent.com/swany00/2024_CML/refs/heads/main/FAOSTAT_data_isocode_1991-2020.csv'
-# GeoJSON 데이터를 URL에서 받아오기
-geo_url = 'https://raw.githubusercontent.com/swany00/2024_CML/refs/heads/main/World_Countries__Generalized_.geojson'
-geo_data = json.loads(requests.get(geo_url).text)
-
-# URL에서 파일 읽기
-df = pd.read_csv(file_url)
-
-# 데이터에서 필요한 열 선택
-tdf = df.iloc[:, [2, 9, 11]]
-
-folium.Choropleth(geo_data = geo_data)
-m = folium.Map(location = [0, -160], zoom_start = 2,
-               max_bounds = True, 
-               min_zoom = 2, min_lat = -84, 
-               max_lat = 84, min_lon = -175, max_lon = 187)
-folium.Choropleth(geo_data = geo_data, 
-             data = tdf,
-             columns = ['Area Code (ISO2)','Value'], key_on = 'properties.ISO',
-             highlight = True,
-             fill_color = 'RdYlGn', fill_opacity = 0.7, line_opacity = 0.5,
-             legend_name = '곡물수확량').add_to(m)
-
-m
 ```
+ # 목적 : 위 데이터는 기후변화에 따른 피해량산출을 위하여 사용된 자료입니다.
 
-## Column {width=50%}
+ # 소개 :  이 데이터는 2015년 기준으로 농업생산량을 100으로 설정했을때 30년간 국가별 농업 생산량의 증감량을 평균하여 시각화한 지도입니다.
 
-```{python}
-#| title: 2018~2019년도 전기사용량 (서울)
-seoul_dict = local_dict.copy() 
-seoul_dict['features'] = [l for l in seoul_dict['features'] if l['properties']['code'][:2] == '11']
-fig = px.choropleth_mapbox(
-    geojson = seoul_dict,
-    featureidkey = 'properties.code',
-    data_frame = df2,
-    locations = 'code_local',
-    color = '에너지사용량(TOE)/전기',
-    animation_frame= '년도',
-    hover_data = ['시도','지역'],
-    #---#
-    mapbox_style="carto-positron",
-    range_color = [0,400000],
-    center={"lat": 37.5642135, "lon": 127.0016985},
-    zoom=9,
-)
-fig.show(config={'scrollZoom':False})
-```
+ - 양수 값: 해당 연도의 생산량이 2015년보다 높음을 의미합니다. 
+    즉, 해당 국가가 기준 연도보다 더 많은 농산물을 생산했다는 뜻입니다.
+ - 음수 값: 해당 연도의 생산량이 2015년보다 낮음을 나타냅니다. 
+    즉, 해당 국가의 생산량이 기준 연도보다 감소한 것을 의미합니다.
+ - 0 값: 해당 연도의 생산량이 기준 연도인 2015년과 동일함을 나타냅니다.
 
-```{python}
-#| title: 2018~2019년도 에너지사용량 (전국)
-fig = df2.drop(['code_local','code'],axis=1)\
-.set_index(['년도','시도','지역','건물동수','연면적']).stack().reset_index()\
-.rename({'level_5':'에너지종류', 0:'에너지사용량'},axis=1)\
-.assign(에너지종류 = lambda df: df['에너지종류'].str.split('/').str[-1])\
-.groupby(['년도','시도','에너지종류']).agg({'에너지사용량':'sum'})\
-.stack().reset_index()\
-.rename({0:'에너지사용량'},axis=1)\
-.plot.area(
-    x='년도',y='에너지사용량',
-    color='시도',
-    facet_col='에너지종류'
-)
-fig.update_layout(
-    xaxis_domain=[0.0, 0.25],
-    xaxis2_domain=[0.35, 0.60],
-    xaxis3_domain=[0.70, 0.95]
-)
+ # 출처 : FAOSTATDatabase
 ```

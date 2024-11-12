@@ -322,10 +322,10 @@ HTML(html_animation)
 
 ```
 
-# 회귀 분석
+# 변화율 시각화
 
 ```{python}
-#| title: 회귀 분석 결과 시각화
+#| title: 회귀 분석 결과 시각화변화율 시각화
 import numpy as np
 import xarray as xr
 import json

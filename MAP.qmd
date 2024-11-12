@@ -88,7 +88,7 @@ for i in range(len(geo_data['features'])):
 # 극한강수지수 및 가뭄지수
 
 ```{python}
-#| title: 극한강수지수 및 가뭄지수
+#| output: false
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -153,7 +153,10 @@ html_animation = html_animation.replace('<video ', '<video autoplay loop width="
 
 # 플롯 닫기
 plt.close(fig)
+```
 
+```{python}
+#| title: 극한강수지수 및 가뭄지수
 # HTML로 애니메이션 표시
 HTML(html_animation)
 
@@ -222,7 +225,7 @@ for i in range(len(production_index_values)):
         production_index_values[i][lon] = production_index_values[i][lon] - 180
 
 # 새로운 플롯 생성 (3x2 그리드)
-fig, axs = plt.subplots(3, 2, figsize=(20, 15), constrained_layout=True)
+fig, axs = plt.subplots(3, 2, figsize=(10, 6), dpi=80, constrained_layout=True)
 
 # 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
 im2 = axs[0, 0].imshow(cwd[0], cmap='Blues', alpha=1, origin='lower')
@@ -292,13 +295,13 @@ import matplotlib.animation as animation
 from IPython.display import HTML
 
 # 새로운 플롯 생성 (1x1 그리드)
-fig, axs = plt.subplots(1, 1, figsize=(20, 15), constrained_layout=True)
+fig, axs = plt.subplots(1, 1, figsize=(10, 6), dpi=80, constrained_layout=True)
 
 # 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
 im11 = axs.imshow(production_index_values[0], cmap='YlGnBu', alpha=1, origin='lower')
 fig.colorbar(im11, ax=axs)
-axs.set_xticks()  # x축 눈금 없애기
-axs.set_yticks()  # y축 눈금 없애기
+axs.set_xticks([])  # x축 눈금 없애기
+axs.set_yticks([])  # y축 눈금 없애기
 
 # 애니메이션 업데이트 함수
 def update(i):
@@ -342,25 +345,30 @@ file_paths = {
     'r95': '/root/notenotenote/r95_era5_1991-2020.nc',
     'r99': '/root/notenotenote/r99_era5_1991-2020.nc',
     'rx1day': '/root/notenotenote/rx1day_era5_1991-2020.nc',
-    'rx5day': '/root/notenotenote/rx5day_era5_1991-2020.nc',
+    'rx5day': '/root/notenotenote/rx5day_1991-2020.nc',
     'cwd': '/root/notenotenote/cwd_era5_1991-2020.nc',
     'cdd': '/root/notenotenote/cdd_era5_1991-2020.nc'
 }
 
+# 일부 해상도만 사용
+sampling_interval = 5  # 샘플링 간격, 숫자를 조정하여 해상도를 줄임
 climate_variables = {}
 
 for var, path in file_paths.items():
-    climate_variables[var] = xr.open_dataset(path, decode_times=False)[var].values
+    ds = xr.open_dataset(path, decode_times=False)
+    # 해상도 축소
+    climate_variables[var] = ds[var].values[:, ::sampling_interval, ::sampling_interval]
+
+# production_index_values 해상도 축소
+production_index_values = production_index_values[:, ::sampling_interval, ::sampling_interval]
 
 # 데이터 차원 확인
 print("production_index_values shape:", production_index_values.shape)
 for var in climate_variables:
     print(f"{var} shape:", climate_variables[var].shape)
 
-# assumption: production_index_values and climate data are of shape (time, lat, lon)
-time_len, lat_len, lon_len = production_index_values.shape
-
 # 회귀 분석 결과 저장할 배열 초기화
+time_len, lat_len, lon_len = production_index_values.shape
 slope_dict = {var: np.full((lat_len, lon_len), np.nan) for var in climate_variables}
 
 # 회귀 분석 수행
@@ -378,7 +386,7 @@ for lat in range(lat_len):
             if len(valid_climate_data) > 1:  # 최소 2개의 유효 데이터가 있어야 회귀 분석 가능
                 # 회귀 분석
                 model = LinearRegression()
-                model.fit(valid_climate_data.reshape(-1, 1), valid_production_index_values)  # 2D로 reshape
+                model.fit(valid_climate_data.reshape(-1, 1), valid_production_index_values)
                 
                 # 기울기 저장
                 slope_dict[var][lat, lon] = model.coef_[0]
@@ -388,7 +396,7 @@ plt.figure(figsize=(15, 10))
 
 # 각 기후 변수의 기울기 시각화
 for i, (var, slope) in enumerate(slope_dict.items(), start=1):
-    plt.subplot(2, 3, i)s
+    plt.subplot(2, 3, i)
     plt.imshow(slope, cmap='coolwarm', origin='lower', interpolation='nearest')
     plt.colorbar(label=f"Slope (Production Index vs {var})")
     plt.title(f"Slope ({var})")
@@ -396,6 +404,7 @@ for i, (var, slope) in enumerate(slope_dict.items(), start=1):
 
 plt.tight_layout()
 plt.show()
+
 
 ```
 

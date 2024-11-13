@@ -322,89 +322,114 @@ HTML(html_animation)
 
 ```
 
-# 변화율 시각화
+# 데이터 경향성 분석
 
 ```{python}
-#| title: 회귀 분석 결과 시각화변화율 시각화
-import numpy as np
-import xarray as xr
-import json
-import requests
-from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
+#| title: 경향성분석
+file_path_r95 = '/root/notenotenote/r95_era5_1991-2020.nc'
+file_path_r99 = '/root/notenotenote/r99_era5_1991-2020.nc'
+file_path_rx1day = '/root/notenotenote/rx1day_era5_1991-2020.nc'
+file_path_rx5day = '/root/notenotenote/rx5day_era5_1991-2020.nc'
+file_path_cwd = '/root/notenotenote/cwd_era5_1991-2020.nc'
+file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'
+# 데이터 로드
+r95 = xr.open_dataset(file_path_r95, decode_times=False)['r95'].values
+r99 = xr.open_dataset(file_path_r99, decode_times=False)['r99'].values
+rx1day = xr.open_dataset(file_path_rx1day, decode_times=False)['rx1day'].values
+rx5day = xr.open_dataset(file_path_rx5day, decode_times=False)['rx5day'].values
+cwd = xr.open_dataset(file_path_cwd, decode_times=False)['cwd'].values
+cdd = xr.open_dataset(file_path_cdd, decode_times=False)['cdd'].values
+# 그래프 그리기 함수
+def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day):
+    """
+    각 extreme rainfall 데이터를 기반으로 그래프를 그리는 함수입니다.
+    """
+    # x축을 1부터 30년으로 설정
+    years = np.arange(1991, 2021)
+    
+    # 기준 값 (production_index_values[14]) 계산
+    piv15 = np.nansum(production_index_values[14])
 
-# 데이터 가져오기
-com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
-com_product_idx = json.loads(requests.get(com_product_idx).text)
-production_index = com_product_idx['data_vars']
-production_index_values = list(production_index.values())[0]['data']
-production_index_values = np.array(production_index_values)
+    # 각 데이터 항목의 연도별 합계 계산 후 piv15 빼기
+    po = [np.nansum(rx1day[i]) for i in range(30)]
+    co = [np.nansum(rx5day[i]) for i in range(30)]
+    cdd_sum = [np.nansum(cdd[i]) for i in range(30)]
+    cwd_sum = [np.nansum(cwd[i]) for i in range(30)]
+    r95_sum = [np.nansum(r95[i]) for i in range(30)]
+    r99_sum = [np.nansum(r99[i]) for i in range(30)]
+    production_index_sum = [np.nansum(production_index_values[i])-piv15 for i in range(30)]
 
-# NetCDF 파일 로드 (r95, r99, rx1day, rx5day, cwd, cdd)
-file_paths = {
-    'r95': '/root/notenotenote/r95_era5_1991-2020.nc',
-    'r99': '/root/notenotenote/r99_era5_1991-2020.nc',
-    'rx1day': '/root/notenotenote/rx1day_era5_1991-2020.nc',
-    'rx5day': '/root/notenotenote/rx5day_1991-2020.nc',
-    'cwd': '/root/notenotenote/cwd_era5_1991-2020.nc',
-    'cdd': '/root/notenotenote/cdd_era5_1991-2020.nc'
-}
+    # 그래프 그리기
+    plt.figure(figsize=(12, 8))
 
-# 일부 해상도만 사용
-sampling_interval = 5  # 샘플링 간격, 숫자를 조정하여 해상도를 줄임
-climate_variables = {}
+    # Production Index 그래프
+    plt.subplot(3, 2, 1)
+    plt.plot(years, production_index_sum, marker='o', color='b', label='Production Index')
+    plt.xlabel('Years')
+    plt.ylabel('Production Index Sum')
+    plt.title('Production Index Sum')
+    plt.grid()
+    plt.legend()
 
-for var, path in file_paths.items():
-    ds = xr.open_dataset(path, decode_times=False)
-    # 해상도 축소
-    climate_variables[var] = ds[var].values[:, ::sampling_interval, ::sampling_interval]
+    # CWD 그래프
+    plt.subplot(3, 2, 2)
+    plt.plot(years, cwd_sum, marker='o', color='g', label='CWD')
+    plt.xlabel('Years')
+    plt.ylabel('CWD Sum')
+    plt.title('CWD Sum')
+    plt.grid()
+    plt.legend()
 
-# production_index_values 해상도 축소
-production_index_values = production_index_values[:, ::sampling_interval, ::sampling_interval]
+    # CDD 그래프
+    plt.subplot(3, 2, 3)
+    plt.plot(years, cdd_sum, marker='o', color='r', label='CDD')
+    plt.xlabel('Years')
+    plt.ylabel('CDD Sum')
+    plt.title('CDD Sum')
+    plt.grid()
+    plt.legend()
 
-# 데이터 차원 확인
-print("production_index_values shape:", production_index_values.shape)
-for var in climate_variables:
-    print(f"{var} shape:", climate_variables[var].shape)
+    # R95 그래프
+    plt.subplot(3, 2, 4)
+    plt.plot(years, r95_sum, marker='o', color='c', label='R95')
+    plt.xlabel('Years')
+    plt.ylabel('R95 Sum')
+    plt.title('R95 Sum')
+    plt.grid()
+    plt.legend()
 
-# 회귀 분석 결과 저장할 배열 초기화
-time_len, lat_len, lon_len = production_index_values.shape
-slope_dict = {var: np.full((lat_len, lon_len), np.nan) for var in climate_variables}
+    # R99 그래프
+    plt.subplot(3, 2, 5)
+    plt.plot(years, r99_sum, marker='o', color='m', label='R99')
+    plt.xlabel('Years')
+    plt.ylabel('R99 Sum')
+    plt.title('R99 Sum')
+    plt.grid()
+    plt.legend()
 
-# 회귀 분석 수행
-for lat in range(lat_len):
-    for lon in range(lon_len):
-        # 유효한 값 찾기 (NaN이 아닌 값들만)
-        valid_mask = ~np.isnan(production_index_values[:, lat, lon])
-        
-        # 각 기후 변수에 대해 유효한 데이터만 추출
-        valid_production_index_values = production_index_values[valid_mask, lat, lon]
-        
-        for var, data in climate_variables.items():
-            valid_climate_data = data[valid_mask, lat, lon]
-            
-            if len(valid_climate_data) > 1:  # 최소 2개의 유효 데이터가 있어야 회귀 분석 가능
-                # 회귀 분석
-                model = LinearRegression()
-                model.fit(valid_climate_data.reshape(-1, 1), valid_production_index_values)
-                
-                # 기울기 저장
-                slope_dict[var][lat, lon] = model.coef_[0]
+    # RX1DAY 그래프
+    plt.subplot(3, 2, 6)
+    plt.plot(years, po, marker='o', color='y', label='RX1DAY')
+    plt.xlabel('Years')
+    plt.ylabel('RX1DAY Sum')
+    plt.title('RX1DAY Sum')
+    plt.grid()
+    plt.legend()
 
-# 회귀 분석 결과 시각화
-plt.figure(figsize=(15, 10))
+    # RX5DAY 그래프
+    plt.figure(figsize=(10, 5))
+    plt.plot(years, co, marker='o', color='purple', label='RX5DAY')
+    plt.xlabel('Years')
+    plt.ylabel('RX5DAY Sum')
+    plt.title('RX5DAY Sum')
+    plt.grid()
+    plt.legend()
 
-# 각 기후 변수의 기울기 시각화
-for i, (var, slope) in enumerate(slope_dict.items(), start=1):
-    plt.subplot(2, 3, i)
-    plt.imshow(slope, cmap='coolwarm', origin='lower', interpolation='nearest')
-    plt.colorbar(label=f"Slope (Production Index vs {var})")
-    plt.title(f"Slope ({var})")
-    plt.axis('off')
+    plt.tight_layout()
+    plt.show()
 
-plt.tight_layout()
-plt.show()
 
+plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day)
 
 ```
 

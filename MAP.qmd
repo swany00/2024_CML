@@ -66,10 +66,10 @@ for i in range(len(geo_data['features'])):
     area_code = geo_data['features'][i]['properties']['ISO']
     
     # 전체 데이터의 평균값을 계산
-    avg_value = tdf[tdf['Area Code (ISO2)'] == area_code]['Value'].mean()
+    avg_value = tdf[tdf['Area Code (ISO2)'] == geo_data['features'][14]['properties']['ISO']]['Value'].mean()
     
     # 툴팁 내용 설정 (예: 평균값만 표시)
-    tooltip_content = f'{area_code}: 평균 {avg_value:.2f}'
+    tooltip_content = f'{area_code}: 15년 {avg_value:.2f}'
     
     # GeoJSON 데이터 객체
     geo_json_str = geo_data['features'][i]
@@ -85,7 +85,7 @@ for i in range(len(geo_data['features'])):
 
 ```
 
-# 극한강수지수 및 가뭄지수
+# 기후데이터
 
 ```{python}
 #| output: false
@@ -160,135 +160,21 @@ plt.close(fig)
 # HTML로 애니메이션 표시
 HTML(html_animation)
 
-
-```
-
-# 극한강수인덱스
-
-```{python}
-#| title: 극한강수인덱스
-
-pd.options.plotting.backend = "plotly"
-pio.templates.default = "plotly_white"
-
-# combined_production_index 읽기
-com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
-com_product_idx = json.loads(requests.get(com_product_idx).text)
-production_index = com_product_idx['data_vars']
-production_index_values = list(production_index.values())[0]['data']
-production_index_values=np.array(production_index_values)
-
-# cwd 읽기
-cwd = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_cwd.json'
-cwd = json.loads(requests.get(cwd).text)
-cwd = cwd['data_vars']
-cwd = list(cwd.values())[0]['data']
-
-
-# cdd 읽기
-cdd = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_cdd.json'
-cdd = json.loads(requests.get(cdd).text)
-cdd = cdd['data_vars']
-cdd = list(cdd.values())[0]['data']
-
-
-# r95 읽기
-r95 = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_r95.json'
-r95 = json.loads(requests.get(r95).text)
-r95 = r95['data_vars']
-r95 = list(r95.values())[0]['data']
-
-# r99 읽기
-r99 = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_r99.json'
-r99 = json.loads(requests.get(r99).text)
-r99 = r99['data_vars']
-r99 = list(r99.values())[0]['data']
-
-
-# rx1day 읽기
-rx1day = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_rx1day.json'
-rx1day = json.loads(requests.get(rx1day).text)
-rx1day = rx1day['data_vars']
-rx1day = list(rx1day.values())[0]['data']
-
-# rx5day 읽기
-rx5day = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_extreme_rainfall_average_rx5day.json'
-rx5day = json.loads(requests.get(rx5day).text)
-rx5day = rx5day['data_vars']
-rx5day = list(rx5day.values())[0]['data']
-
-
-for i in range(len(production_index_values)):
-    for lat in range(len(production_index_values[0].T[0])):
-        production_index_values[i].T[lat] = production_index_values[i].T[lat] - 3.1
-    for lon in range(len(production_index_values[0])):
-        production_index_values[i][lon] = production_index_values[i][lon] - 180
-
-# 새로운 플롯 생성 (3x2 그리드)
-fig, axs = plt.subplots(3, 2, figsize=(10, 6), dpi=80, constrained_layout=True)
-
-# 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
-im2 = axs[0, 0].imshow(cwd[0], cmap='Blues', alpha=1, origin='lower')
-fig.colorbar(im2, ax=axs[0, 0])
-
-im4 = axs[0, 1].imshow(cdd[0], cmap='Reds', alpha=1, origin='lower')
-fig.colorbar(im4, ax=axs[0, 1])
-
-im6 = axs[1, 0].imshow(r95[0], cmap='Purples', alpha=1, origin='lower')
-fig.colorbar(im6, ax=axs[1, 0])
-
-im8 = axs[1, 1].imshow(r99[0], cmap='Greens', alpha=1, origin='lower')
-fig.colorbar(im8, ax=axs[1, 1])
-
-im10 = axs[2, 0].imshow(rx1day[0], cmap='Oranges', alpha=1, origin='lower')
-fig.colorbar(im10, ax=axs[2, 0])
-
-im12 = axs[2, 1].imshow(rx5day[0], cmap='YlOrRd', alpha=1, origin='lower')
-fig.colorbar(im12, ax=axs[2, 1])
-
-
-
-# 애니메이션 업데이트 함수
-def update(i):
-    # 각 인덱스를 해당 시간에 맞게 선택
-    im2.set_data(cwd[i])
-    axs[0, 0].set_title(f'Year {i + 1991} - CWD')
-
-    im4.set_data(cdd[i])
-    axs[0, 1].set_title(f'Year {i + 1991} - CDD')
-
-    im6.set_data(r95[i])
-    axs[1, 0].set_title(f'Year {i + 1991} - R95')
-
-    im8.set_data(r99[i])
-    axs[1, 1].set_title(f'Year {i + 1991} - R99')
-
-    im10.set_data(rx1day[i])
-    axs[2, 0].set_title(f'Year {i + 1991} - RX1DAY')
-
-    im12.set_data(rx5day[i])
-    axs[2, 1].set_title(f'Year {i + 1991} - RX5DAY')
-
-    for ax in axs.flat:
-        ax.set_xticks([])  # x축 눈금 없애기
-        ax.set_yticks([])  # y축 눈금 없애기
-        
-# 애니메이션 생성
-ani = animation.FuncAnimation(fig, update, frames=30, interval=400)
-html_animation = ani.to_jshtml()
-html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="400" ')
-plt.close(fig)
-
-# 애니메이션을 HTML로 표시
-HTML(html_animation)
+print("1. r95: 일일 강수량에서 상위 5%에 해당하는 값. 극단적인 폭우를 분석할 때 사용.")
+print("2. r99: 일일 강수량에서 상위 1%에 해당하는 값. 극단적인 폭우나 홍수를 분석할 때 사용.")
+print("3. rx1day: 관측 기간 동안 가장 많은 1일 강수량. 큰 폭우가 발생한 날 분석.")
+print("4. rx5day: 연속된 5일 동안의 최대 강수량. 집중적인 강수 이벤트 분석.")
+print("5. cwd: 연속적으로 비가 내린 날 수. 지속적인 비가 내리는 기간 분석.")
+print("6. cdd: 연속적인 건조한 날 수. 가뭄 및 건조 조건 분석.")
 
 ```
 
 
-# 피해지수 데이터
+# 피해지수데이터
 
 ```{python}
-#| title: 피해량 인덱스
+#| output: false
+
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
@@ -316,9 +202,20 @@ html_animation = ani.to_jshtml()
 html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="450" ')
 
 plt.close(fig)
+```
+
+```{python}
+
+#| title: 국가별 농업 총 생산지수 
 
 # 애니메이션을 HTML로 표시
 HTML(html_animation)
+print("목적: 기후변화에 따른 피해량 산출을 위한 자료.")
+print("소개: 2015년 기준 농업 생산량을 100으로 설정, 30년간 국가별 농업 생산량 증감 평균 지도.")
+print("양수 값: 해당 연도 생산량이 2015년보다 높음 (더 많은 농산물 생산).")
+print("음수 값: 해당 연도 생산량이 2015년보다 낮음 (생산량 감소).")
+print("0 값: 해당 연도 생산량이 2015년과 동일.")
+print("출처: FAOSTAT Database.")
 
 ```
 
@@ -340,6 +237,14 @@ rx5day = xr.open_dataset(file_path_rx5day, decode_times=False)['rx5day'].values
 cwd = xr.open_dataset(file_path_cwd, decode_times=False)['cwd'].values
 cdd = xr.open_dataset(file_path_cdd, decode_times=False)['cdd'].values
 # 그래프 그리기 함수
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+
 def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day):
     """
     각 extreme rainfall 데이터를 기반으로 그래프를 그리는 함수입니다.
@@ -359,81 +264,92 @@ def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx
     r99_sum = [np.nansum(r99[i]) for i in range(30)]
     production_index_sum = [np.nansum(production_index_values[i])-piv15 for i in range(30)]
 
-    # 그래프 그리기
-    plt.figure(figsize=(12, 8))
+    # 서브플롯을 키우기 위해서 figsize 설정
+    fig, axs = plt.subplots(3, 2, figsize=(25, 20), dpi=80)  # 그래프 크기를 더 크게 설정
 
-    # Production Index 그래프
-    plt.subplot(3, 2, 1)
-    plt.plot(years, production_index_sum, marker='o', color='b', label='Production Index')
-    plt.xlabel('Years')
-    plt.ylabel('Production Index Sum')
-    plt.title('Production Index Sum')
-    plt.grid()
-    plt.legend()
-
-    # CWD 그래프
-    plt.subplot(3, 2, 2)
-    plt.plot(years, cwd_sum, marker='o', color='g', label='CWD')
-    plt.xlabel('Years')
-    plt.ylabel('CWD Sum')
-    plt.title('CWD Sum')
-    plt.grid()
-    plt.legend()
-
-    # CDD 그래프
-    plt.subplot(3, 2, 3)
-    plt.plot(years, cdd_sum, marker='o', color='r', label='CDD')
-    plt.xlabel('Years')
-    plt.ylabel('CDD Sum')
-    plt.title('CDD Sum')
-    plt.grid()
-    plt.legend()
+    # Formatter 설정 (천 단위 구분 및 가독성 좋은 형식)
+    def thousands_formatter(x, pos):
+        return f'{x*1e-6:.1f}M'  # 1,000,000 단위로 표기
 
     # R95 그래프
-    plt.subplot(3, 2, 4)
-    plt.plot(years, r95_sum, marker='o', color='c', label='R95')
-    plt.xlabel('Years')
-    plt.ylabel('R95 Sum')
-    plt.title('R95 Sum')
-    plt.grid()
-    plt.legend()
+    axs[0, 0].plot(years, r95_sum, marker='o', color='c', label='R95')
+    axs[0, 0].set_xlabel('Years', fontsize=12)
+    axs[0, 0].set_ylabel('R95 Sum', fontsize=12)
+    axs[0, 0].set_title('R95 Sum', fontsize=14)
+    axs[0, 0].grid(True)
+    axs[0, 0].legend()
+    axs[0, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
     # R99 그래프
-    plt.subplot(3, 2, 5)
-    plt.plot(years, r99_sum, marker='o', color='m', label='R99')
-    plt.xlabel('Years')
-    plt.ylabel('R99 Sum')
-    plt.title('R99 Sum')
-    plt.grid()
-    plt.legend()
+    axs[0, 1].plot(years, r99_sum, marker='o', color='m', label='R99')
+    axs[0, 1].set_xlabel('Years', fontsize=12)
+    axs[0, 1].set_ylabel('R99 Sum', fontsize=12)
+    axs[0, 1].set_title('R99 Sum', fontsize=14)
+    axs[0, 1].grid(True)
+    axs[0, 1].legend()
+    axs[0, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
     # RX1DAY 그래프
-    plt.subplot(3, 2, 6)
-    plt.plot(years, po, marker='o', color='y', label='RX1DAY')
-    plt.xlabel('Years')
-    plt.ylabel('RX1DAY Sum')
-    plt.title('RX1DAY Sum')
-    plt.grid()
-    plt.legend()
+    axs[1, 1].plot(years, po, marker='o', color='y', label='RX1DAY')
+    axs[1, 1].set_xlabel('Years', fontsize=12)
+    axs[1, 1].set_ylabel('RX1DAY Sum', fontsize=12)
+    axs[1, 1].set_title('RX1DAY Sum', fontsize=14)
+    axs[1, 1].grid(True)
+    axs[1, 1].legend()
+    axs[1, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
     # RX5DAY 그래프
-    plt.figure(figsize=(10, 5))
-    plt.plot(years, co, marker='o', color='purple', label='RX5DAY')
-    plt.xlabel('Years')
-    plt.ylabel('RX5DAY Sum')
-    plt.title('RX5DAY Sum')
-    plt.grid()
-    plt.legend()
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    axs[2,1].plot(years, co, marker='o', color='purple', label='RX5DAY')
+    axs[2,1].set_xlabel('Years', fontsize=12)
+    axs[2,1].set_ylabel('RX5DAY Sum', fontsize=12)
+    axs[2,1].set_title('RX5DAY Sum', fontsize=14)
+    axs[2,1].grid(True)
+    axs[2,1].legend()
+    axs[2,1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
+    # CWD 그래프
+    axs[1, 0].plot(years, cwd_sum, marker='o', color='g', label='CWD')
+    axs[1, 0].set_xlabel('Years', fontsize=12)
+    axs[1, 0].set_ylabel('CWD Sum', fontsize=12)
+    axs[1, 0].set_title('CWD Sum', fontsize=14)
+    axs[1, 0].grid(True)
+    axs[1, 0].legend()
+    axs[1, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+
+    # CDD 그래프
+    axs[2, 0].plot(years, cdd_sum, marker='o', color='r', label='CDD')
+    axs[2, 0].set_xlabel('Years', fontsize=12)
+    axs[2, 0].set_ylabel('CDD Sum', fontsize=12)
+    axs[2, 0].set_title('CDD Sum', fontsize=14)
+    axs[2, 0].grid(True)
+    axs[2, 0].legend()
+    axs[2, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+
+    # Production Index 그래프
+    ax2.plot(years, production_index_sum, marker='o', color='b', label='Production Index')
+    ax2.set_xlabel('Years', fontsize=12)
+    ax2.set_ylabel('Production Index Sum', fontsize=12)
+    ax2.set_title('Production Index Sum', fontsize=14)
+    ax2.grid(True)
+    ax2.legend()
+    ax2.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+
+
+    # 서브플롯 간 간격을 넓히기 위해서 adjust 사용
+    plt.subplots_adjust(hspace=0.5, wspace=0.4)  # 서브플롯 간 간격을 넓힘
+
+    # 그래프 렌더링
     plt.tight_layout()
     plt.show()
 
 
 plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day)
 
+
 ```
 
-# 참고자료 시각화
+# 참고자료
 
 ```{python}
 #| title: 2015년 기준 국가별 농업 총 생산지수 
@@ -441,18 +357,4 @@ plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day
 
 # 지도 출력
 m
-```
-
-```
- # 목적 : 위 데이터는 기후변화에 따른 피해량산출을 위하여 사용된 자료입니다.
-
- # 소개 :  이 데이터는 2015년 기준으로 농업생산량을 100으로 설정했을때 30년간 국가별 농업 생산량의 증감량을 평균하여 시각화한 지도입니다.
-
- - 양수 값: 해당 연도의 생산량이 2015년보다 높음을 의미합니다. 
-    즉, 해당 국가가 기준 연도보다 더 많은 농산물을 생산했다는 뜻입니다.
- - 음수 값: 해당 연도의 생산량이 2015년보다 낮음을 나타냅니다. 
-    즉, 해당 국가의 생산량이 기준 연도보다 감소한 것을 의미합니다.
- - 0 값: 해당 연도의 생산량이 기준 연도인 2015년과 동일함을 나타냅니다.
-
- # 출처 : FAOSTATDatabase
 ```

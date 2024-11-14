@@ -188,16 +188,15 @@ from IPython.display import HTML
 
 # 새로운 플롯 생성 (1x1 그리드)
 fig, axs = plt.subplots(1, 1, figsize=(10, 6), dpi=80, constrained_layout=True)
-
 # 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
-im11 = axs.imshow(production_index_values[0], cmap='YlGnBu', alpha=1, origin='lower')
+im11 = axs.imshow(production_index_values[0]-production_index_values[14], cmap='YlGnBu', alpha=1, origin='lower')
 fig.colorbar(im11, ax=axs)
 axs.set_xticks([])  # x축 눈금 없애기
 axs.set_yticks([])  # y축 눈금 없애기
 
 # 애니메이션 업데이트 함수
 def update(i):
-    im11.set_data(production_index_values[i])  # 프레임에 맞는 데이터로 업데이트
+    im11.set_data(production_index_values[i]-production_index_values[14])  # 프레임에 맞는 데이터로 업데이트
     axs.set_title(f'Year {i + 1991} - Production Index', fontsize=24)  # 제목 업데이트
 
 # 애니메이션 생성

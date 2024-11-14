@@ -168,10 +168,10 @@ HTML(html_animation)
 
 print("1. r95: 일일 강수량에서 상위 5%에 해당하는 값. 극단적인 폭우를 분석할 때 사용.")
 print("2. r99: 일일 강수량에서 상위 1%에 해당하는 값. 극단적인 폭우나 홍수를 분석할 때 사용.")
-print("3. rx1day: 관측 기간 동안 가장 많은 1일 강수량. 큰 폭우가 발생한 날 분석.")
+print("3. rx1day: 관측 기간 동안 가장 많은 강수량. 큰 폭우가 발생한 날 분석.")
 print("4. rx5day: 연속된 5일 동안의 최대 강수량. 집중적인 강수 이벤트 분석.")
 print("5. cwd: 연속적으로 비가 내린 날 수. 지속적인 비가 내리는 기간 분석.")
-print("6. cdd: 연속적인 건조한 날 수. 가뭄 및 건조 조건 분석.")
+print("6. cdd: 연속적인 건조한 날 수. 가뭄 및 건조 기간 분석.")
 
 ```
 
@@ -189,7 +189,7 @@ from IPython.display import HTML
 # 새로운 플롯 생성 (1x1 그리드)
 fig, axs = plt.subplots(1, 1, figsize=(10, 6), dpi=80, constrained_layout=True)
 # 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
-im11 = axs.imshow(production_index_values[0]-production_index_values[14], cmap='YlGnBu', alpha=1, origin='lower')
+im11 = axs.imshow(production_index_values[0]-production_index_values[14], cmap='coolwarm', alpha=1, origin='lower')
 fig.colorbar(im11, ax=axs)
 axs.set_xticks([])  # x축 눈금 없애기
 axs.set_yticks([])  # y축 눈금 없애기

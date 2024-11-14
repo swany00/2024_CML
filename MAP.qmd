@@ -173,7 +173,7 @@ print("6. cdd: 연속적인 건조한 날 수. 가뭄 및 건조 조건 분석."
 # 피해지수데이터
 
 ```{python}
-#| output: false
+#| title: 국가별 농업 총 생산지수 
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -202,11 +202,7 @@ html_animation = ani.to_jshtml()
 html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="450" ')
 
 plt.close(fig)
-```
 
-```{python}
-
-#| title: 국가별 농업 총 생산지수 
 
 # 애니메이션을 HTML로 표시
 HTML(html_animation)
@@ -228,7 +224,12 @@ file_path_r99 = '/root/notenotenote/r99_era5_1991-2020.nc'
 file_path_rx1day = '/root/notenotenote/rx1day_era5_1991-2020.nc'
 file_path_rx5day = '/root/notenotenote/rx5day_era5_1991-2020.nc'
 file_path_cwd = '/root/notenotenote/cwd_era5_1991-2020.nc'
-file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'
+file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'.
+com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
+com_product_idx = json.loads(requests.get(com_product_idx).text)
+production_index = com_product_idx['data_vars']
+production_index_values = list(production_index.values())[0]['data']
+production_index_values=np.array(production_index_values)
 # 데이터 로드
 r95 = xr.open_dataset(file_path_r95, decode_times=False)['r95'].values
 r99 = xr.open_dataset(file_path_r99, decode_times=False)['r99'].values

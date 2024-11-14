@@ -32,6 +32,12 @@ geo_url = 'https://raw.githubusercontent.com/swany00/2024_CML/refs/heads/main/Wo
 # GeoJSON 데이터 로드
 geo_data = json.loads(requests.get(geo_url).text)
 
+com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
+com_product_idx = json.loads(requests.get(com_product_idx).text)
+production_index = com_product_idx['data_vars']
+production_index_values = list(production_index.values())[0]['data']
+production_index_values=np.array(production_index_values)
+
 # 데이터 읽기
 df = pd.read_csv(file_url)
 
@@ -66,7 +72,7 @@ for i in range(len(geo_data['features'])):
     area_code = geo_data['features'][i]['properties']['ISO']
     
     # 전체 데이터의 평균값을 계산
-    avg_value = tdf[tdf['Area Code (ISO2)'] == geo_data['features'][14]['properties']['ISO']]['Value'].mean()
+    avg_value = tdf[tdf['Area Code (ISO2)'] == area_code]['Value'].mean()
     
     # 툴팁 내용 설정 (예: 평균값만 표시)
     tooltip_content = f'{area_code}: 15년 {avg_value:.2f}'
@@ -224,12 +230,8 @@ file_path_r99 = '/root/notenotenote/r99_era5_1991-2020.nc'
 file_path_rx1day = '/root/notenotenote/rx1day_era5_1991-2020.nc'
 file_path_rx5day = '/root/notenotenote/rx5day_era5_1991-2020.nc'
 file_path_cwd = '/root/notenotenote/cwd_era5_1991-2020.nc'
-file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'.
-com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
-com_product_idx = json.loads(requests.get(com_product_idx).text)
-production_index = com_product_idx['data_vars']
-production_index_values = list(production_index.values())[0]['data']
-production_index_values=np.array(production_index_values)
+file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'
+
 # 데이터 로드
 r95 = xr.open_dataset(file_path_r95, decode_times=False)['r95'].values
 r99 = xr.open_dataset(file_path_r99, decode_times=False)['r99'].values

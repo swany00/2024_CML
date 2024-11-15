@@ -185,14 +185,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.animation as animation
 from IPython.display import HTML
+from matplotlib.colors import TwoSlopeNorm
 
-# 새로운 플롯 생성 (1x1 그리드)
 fig, axs = plt.subplots(1, 1, figsize=(10, 6), dpi=80, constrained_layout=True)
-# 첫 번째 프레임의 데이터를 이용해 초기 colorbar를 생성
-im11 = axs.imshow(production_index_values[0]-production_index_values[14], cmap='coolwarm', alpha=1, origin='lower')
-fig.colorbar(im11, ax=axs)
-axs.set_xticks([])  # x축 눈금 없애기
-axs.set_yticks([])  # y축 눈금 없애기
+
+# 데이터 차이의 최소, 최대값을 계산
+diff_data = production_index_values[0] - production_index_values[14]
+vmin, vmax = diff_data.min(), diff_data.max()
+
+# 중심을 0으로 설정한 노말라이저를 사용해 colorbar 생성
+norm = TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+im11 = axs.imshow(diff_data, cmap='coolwarm', norm=norm, alpha=1, origin='lower')
+cbar = fig.colorbar(im11, ax=axs)
+cbar.set_label('Production Index Difference')
+
+# x축과 y축 눈금 제거
+axs.set_xticks([])
+axs.set_yticks([])
 
 # 애니메이션 업데이트 함수
 def update(i):
@@ -207,7 +216,6 @@ html_animation = ani.to_jshtml()
 html_animation = html_animation.replace('<video ', '<video autoplay loop width="600" height="450" ')
 
 plt.close(fig)
-
 
 # 애니메이션을 HTML로 표시
 HTML(html_animation)

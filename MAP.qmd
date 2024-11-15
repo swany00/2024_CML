@@ -9,6 +9,64 @@ execute:
   error: true
 ---
 
+<script>
+    // 쿠키 값을 가져오는 함수
+    function getCookie(name) {
+        var cookies = document.cookie.split(";");
+        for (var i = 0; i < cookies.length; i++) {
+            if (cookies[i].indexOf("=") == -1) {
+                if (name == cookies[i])
+                    return "";
+            } else {
+                var crumb = cookies[i].split("=");
+                if (name == crumb[0].trim())
+                    return unescape(crumb[1].trim());
+            }
+        }
+    };
+
+    var desktopModeTF = getCookie("DesktopMode");
+    var Scale = getCookie("DesktopModeScale");
+    var defWidth = 1170;  // PC 기준 너비 설정
+    if (desktopModeTF == "true") {
+        document.write('<meta name="viewport" content="width=' + defWidth + ', user-scalable=yes, initial-scale=' + Scale + '">');
+    } else {
+        document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">');
+    }
+
+    // PC모드 전환 함수
+    function desktopMode() {
+        if (getCookie("DesktopMode") == "true") {
+            setModeCookie(false);
+        } else {
+            alert("다시한번 클릭하시면 원래대로 돌아옵니다.");
+            setModeCookie(true);
+            window.scrollTo(0, 0);
+        }
+        location.reload();
+    }
+
+    // 쿠키를 설정하는 함수
+    function setModeCookie(switchOn) {
+        var now = new Date();
+        var time = now.getTime();
+        time += 3600 * 1000;  // 1시간 뒤 만료 설정
+        now.setTime(time);
+        document.cookie = 'DesktopMode=' + switchOn + '; expires=' + now.toUTCString();
+        if (switchOn) {
+            document.cookie = "DesktopModeScale=" + $('html').width() / defWidth + '; expires=' + now.toUTCString();
+        }
+    }
+</script>
+
+<!-- PC버전 보기 버튼 -->
+<button onclick="desktopMode()">PC버전 보기</button>
+
+<div>
+    <!-- 졸업논문 사진자료 내용 -->
+    <p>이 웹페이지는 모바일에서 PC 버전으로 전환할 수 있습니다.</p>
+</div>
+
 ```{python}
 #| output: false
 import numpy as np

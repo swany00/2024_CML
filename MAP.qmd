@@ -1,5 +1,5 @@
 ---
-title: "극한강수에 따른 피해량 분석"
+title: "졸업논문 사진자료"
 author: "기후논문반"
 format: dashboard
 execute: 
@@ -275,7 +275,7 @@ from matplotlib.ticker import FuncFormatter
         fig, axs = plt.subplots(3, 2, figsize=(25, 20), dpi=80)  # 그래프 크기를 더 크게 설정
 
         # Formatter 설정 (천 단위 구분 및 가독성 좋은 형식)
-        def thousands_formatter(x, pos):
+    def thousands_formatter(x, pos):
             return f'{x*1e-6:.1f}M'  # 1,000,000 단위로 표기
 
         # R95 그래프

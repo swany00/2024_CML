@@ -251,113 +251,115 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
-    # 그래프 그리기 함수
-    def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day, emissions):
-        """
-        각 extreme rainfall 데이터를 기반으로 그래프를 그리는 함수입니다.
-        """
-        # x축을 1991년부터 2021년까지 설정
-        years = np.arange(1991, 2021)
+# 그래프 그리기 함수
+def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day, emissions):
+    """
+    각 extreme rainfall 데이터를 기반으로 그래프를 그리는 함수입니다.
+    """
+    # x축을 1991년부터 2021년까지 설정
+    years = np.arange(1991, 2021)
 
-        # 기준 값 (production_index_values[24]) 계산
-        piv15 = np.nansum(production_index_values[24])
+    # 기준 값 (production_index_values[24]) 계산
+    piv15 = np.nansum(production_index_values[24])
 
-        # 각 데이터 항목의 연도별 합계 계산 후 piv15 빼기
-        po = [np.nansum(rx1day[i]) for i in range(30)]
-        co = [np.nansum(rx5day[i]) for i in range(30)]
-        cdd_sum = [np.nansum(cdd[i]) for i in range(30)]
-        cwd_sum = [np.nansum(cwd[i]) for i in range(30)]
-        r95_sum = [np.nansum(r95[i]) for i in range(30)]
-        r99_sum = [np.nansum(r99[i]) for i in range(30)]
-        production_index_sum = [np.nansum(production_index_values[i])-piv15 for i in range(30)]
+    # 각 데이터 항목의 연도별 합계 계산 후 piv15 빼기
+    po = [np.nansum(rx1day[i]) for i in range(30)]
+    co = [np.nansum(rx5day[i]) for i in range(30)]
+    cdd_sum = [np.nansum(cdd[i]) for i in range(30)]
+    cwd_sum = [np.nansum(cwd[i]) for i in range(30)]
+    r95_sum = [np.nansum(r95[i]) for i in range(30)]
+    r99_sum = [np.nansum(r99[i]) for i in range(30)]
+    production_index_sum = [np.nansum(production_index_values[i]) - piv15 for i in range(30)]
 
-        # 서브플롯을 키우기 위해서 figsize 설정
-        fig, axs = plt.subplots(3, 2, figsize=(25, 20), dpi=80)  # 그래프 크기를 더 크게 설정
+    # 서브플롯을 키우기 위해서 figsize 설정
+    fig, axs = plt.subplots(3, 2, figsize=(25, 20), dpi=80)  # 그래프 크기를 더 크게 설정
 
-        # Formatter 설정 (천 단위 구분 및 가독성 좋은 형식)
+    # Formatter 설정 (천 단위 구분 및 가독성 좋은 형식)
     def thousands_formatter(x, pos):
-            return f'{x*1e-6:.1f}M'  # 1,000,000 단위로 표기
+        return f'{x*1e-6:.1f}M'  # 1,000,000 단위로 표기
 
-        # R95 그래프
-        axs[0, 0].plot(years, r95_sum, marker='o', color='c', label='R95')
-        axs[0, 0].set_xlabel('Years', fontsize=12)
-        axs[0, 0].set_ylabel('R95 Sum', fontsize=12)
-        axs[0, 0].set_title('R95 Sum', fontsize=14)
-        axs[0, 0].grid(True)
-        axs[0, 0].legend()
-        axs[0, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # R95 그래프
+    axs[0, 0].plot(years, r95_sum, marker='o', color='c', label='R95')
+    axs[0, 0].set_xlabel('Years', fontsize=12)
+    axs[0, 0].set_ylabel('R95 Sum', fontsize=12)
+    axs[0, 0].set_title('R95 Sum', fontsize=14)
+    axs[0, 0].grid(True)
+    axs[0, 0].legend()
+    axs[0, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # R99 그래프
-        axs[0, 1].plot(years, r99_sum, marker='o', color='m', label='R99')
-        axs[0, 1].set_xlabel('Years', fontsize=12)
-        axs[0, 1].set_ylabel('R99 Sum', fontsize=12)
-        axs[0, 1].set_title('R99 Sum', fontsize=14)
-        axs[0, 1].grid(True)
-        axs[0, 1].legend()
-        axs[0, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # R99 그래프
+    axs[0, 1].plot(years, r99_sum, marker='o', color='m', label='R99')
+    axs[0, 1].set_xlabel('Years', fontsize=12)
+    axs[0, 1].set_ylabel('R99 Sum', fontsize=12)
+    axs[0, 1].set_title('R99 Sum', fontsize=14)
+    axs[0, 1].grid(True)
+    axs[0, 1].legend()
+    axs[0, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # RX1DAY 그래프
-        axs[1, 1].plot(years, po, marker='o', color='y', label='RX1DAY')
-        axs[1, 1].set_xlabel('Years', fontsize=12)
-        axs[1, 1].set_ylabel('RX1DAY Sum', fontsize=12)
-        axs[1, 1].set_title('RX1DAY Sum', fontsize=14)
-        axs[1, 1].grid(True)
-        axs[1, 1].legend()
-        axs[1, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # RX1DAY 그래프
+    axs[1, 1].plot(years, po, marker='o', color='y', label='RX1DAY')
+    axs[1, 1].set_xlabel('Years', fontsize=12)
+    axs[1, 1].set_ylabel('RX1DAY Sum', fontsize=12)
+    axs[1, 1].set_title('RX1DAY Sum', fontsize=14)
+    axs[1, 1].grid(True)
+    axs[1, 1].legend()
+    axs[1, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # RX5DAY 그래프
-        axs[2, 1].plot(years, co, marker='o', color='purple', label='RX5DAY')
-        axs[2, 1].set_xlabel('Years', fontsize=12)
-        axs[2, 1].set_ylabel('RX5DAY Sum', fontsize=12)
-        axs[2, 1].set_title('RX5DAY Sum', fontsize=14)
-        axs[2, 1].grid(True)
-        axs[2, 1].legend()
-        axs[2, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # RX5DAY 그래프
+    axs[2, 1].plot(years, co, marker='o', color='purple', label='RX5DAY')
+    axs[2, 1].set_xlabel('Years', fontsize=12)
+    axs[2, 1].set_ylabel('RX5DAY Sum', fontsize=12)
+    axs[2, 1].set_title('RX5DAY Sum', fontsize=14)
+    axs[2, 1].grid(True)
+    axs[2, 1].legend()
+    axs[2, 1].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # CWD 그래프
-        axs[1, 0].plot(years, cwd_sum, marker='o', color='g', label='CWD')
-        axs[1, 0].set_xlabel('Years', fontsize=12)
-        axs[1, 0].set_ylabel('CWD Sum', fontsize=12)
-        axs[1, 0].set_title('CWD Sum', fontsize=14)
-        axs[1, 0].grid(True)
-        axs[1, 0].legend()
-        axs[1, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # CWD 그래프
+    axs[1, 0].plot(years, cwd_sum, marker='o', color='g', label='CWD')
+    axs[1, 0].set_xlabel('Years', fontsize=12)
+    axs[1, 0].set_ylabel('CWD Sum', fontsize=12)
+    axs[1, 0].set_title('CWD Sum', fontsize=14)
+    axs[1, 0].grid(True)
+    axs[1, 0].legend()
+    axs[1, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # CDD 그래프
-        axs[2, 0].plot(years, cdd_sum, marker='o', color='r', label='CDD')
-        axs[2, 0].set_xlabel('Years', fontsize=12)
-        axs[2, 0].set_ylabel('CDD Sum', fontsize=12)
-        axs[2, 0].set_title('CDD Sum', fontsize=14)
-        axs[2, 0].grid(True)
-        axs[2, 0].legend()
-        axs[2, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # CDD 그래프
+    axs[2, 0].plot(years, cdd_sum, marker='o', color='r', label='CDD')
+    axs[2, 0].set_xlabel('Years', fontsize=12)
+    axs[2, 0].set_ylabel('CDD Sum', fontsize=12)
+    axs[2, 0].set_title('CDD Sum', fontsize=14)
+    axs[2, 0].grid(True)
+    axs[2, 0].legend()
+    axs[2, 0].yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # Production Index 그래프
-        fig2, ax2 = plt.subplots(figsize=(10, 6))
-        ax2.plot(years, production_index_sum, marker='o', color='b', label='Production Index')
-        ax2.set_xlabel('Years', fontsize=12)
-        ax2.set_ylabel('Production Index Sum', fontsize=12)
-        ax2.set_title('Production Index Sum', fontsize=14)
-        ax2.grid(True)
-        ax2.legend()
-        ax2.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
+    # Production Index 그래프
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    ax2.plot(years, production_index_sum, marker='o', color='b', label='Production Index')
+    ax2.set_xlabel('Years', fontsize=12)
+    ax2.set_ylabel('Production Index Sum', fontsize=12)
+    ax2.set_title('Production Index Sum', fontsize=14)
+    ax2.grid(True)
+    ax2.legend()
+    ax2.yaxis.set_major_formatter(FuncFormatter(thousands_formatter))
 
-        # 배출량 그래프
-        fig3, ax3 = plt.subplots(figsize=(10, 6))
-        ax3.plot(years, emissions, marker='o', color='orange', label='CO2 Emissions')
-        ax3.set_xlabel('Years', fontsize=12)
-        ax3.set_ylabel('Emissions (Million tons CO2eq)', fontsize=12)
-        ax3.set_title('CO2 Emissions Over Time', fontsize=14)
-        ax3.grid(True)
-        ax3
-        # 서브플롯 간 간격을 넓히기 위해서 adjust 사용
-        plt.subplots_adjust(hspace=0.5, wspace=0.4)  # 서브플롯 간 간격을 넓힘
+    # 배출량 그래프
+    fig3, ax3 = plt.subplots(figsize=(10, 6))
+    ax3.plot(years, emissions, marker='o', color='orange', label='CO2 Emissions')
+    ax3.set_xlabel('Years', fontsize=12)
+    ax3.set_ylabel('Emissions (Million tons CO2eq)', fontsize=12)
+    ax3.set_title('CO2 Emissions Over Time', fontsize=14)
+    ax3.grid(True)
+    ax3.legend()
 
-        # 그래프 렌더링
-        plt.tight_layout()
-        plt.show()
+    # 서브플롯 간 간격을 넓히기 위해서 adjust 사용
+    plt.subplots_adjust(hspace=0.5, wspace=0.4)  # 서브플롯 간 간격을 넓힘
 
-plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day)
+    # 그래프 렌더링
+    plt.tight_layout()
+    plt.show()
+
+# 예시 함수 호출
+plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day, emissions)
 
 import numpy as np
 import scipy.stats as stats
@@ -399,17 +401,21 @@ r95_corr, r95_p_value = calculate_correlation(r95_sum, production_index_sum)
 r99_corr, r99_p_value = calculate_correlation(r99_sum, production_index_sum)
 rx1day_corr, rx1day_p_value = calculate_correlation(rx1day_sum, production_index_sum)
 rx5day_corr, rx5day_p_value = calculate_correlation(rx5day_sum, production_index_sum)
+cwdemissions_corr, cwdemissions_p_value = calculate_correlation(cwd_sum, emissions)
 
 # 결과 출력
+print('#','-'*10,'#')
 print('production_index와 상관관계 및 p-value')
-print(f"CO2배출과 상관계수 : {corr_emissions:.2f}, p-value: {p_value_emissions:.2f}")
+print(f"CO2와 상관계수 : {corr_emissions:.2f}, p-value: {p_value_emissions:.2f}")
 print(f"CWD 상관계수: {cwd_corr:.2f}, p-value: {cwd_p_value:.2f}")
 print(f"CDD 상관계수: {cdd_corr:.2f}, p-value: {cdd_p_value:.2f}")
 print(f"R95 상관계수: {r95_corr:.2f}, p-value: {r95_p_value:.2f}")
 print(f"R99 상관계수: {r99_corr:.2f}, p-value: {r99_p_value:.2f}")
 print(f"RX1DAY 상관계수: {rx1day_corr:.2f}, p-value: {rx1day_p_value:.2f}")
 print(f"RX5DAY 상관계수: {rx5day_corr:.2f}, p-value: {rx5day_p_value:.2f}")
-
+print('#','-'*10,'#')
+print('CO2와 상관관계 및 p-value')
+print(f"CWD 상관계수: {cwdemissions_corr:.2f}, p-value: {cwdemissions_p_value:.2f}")
 
 
 

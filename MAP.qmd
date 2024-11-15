@@ -75,7 +75,7 @@ for i in range(len(geo_data['features'])):
     avg_value = tdf[tdf['Area Code (ISO2)'] == area_code]['Value'].mean()
     
     # 툴팁 내용 설정 (예: 평균값만 표시)
-    tooltip_content = f'{area_code}: 15년 {avg_value:.2f}'
+    tooltip_content = f'{area_code}: 평균 {avg_value:.2f}'
     
     # GeoJSON 데이터 객체
     geo_json_str = geo_data['features'][i]
@@ -190,7 +190,7 @@ from matplotlib.colors import TwoSlopeNorm
 fig, axs = plt.subplots(1, 1, figsize=(10, 6), dpi=80, constrained_layout=True)
 
 # 데이터 차이의 최소, 최대값을 계산
-diff_data = production_index_values[0] - production_index_values[14]
+diff_data = production_index_values[0] - production_index_values[24]
 vmin, vmax = diff_data.min(), diff_data.max()
 
 # 중심을 0으로 설정한 노말라이저를 사용해 colorbar 생성
@@ -205,7 +205,7 @@ axs.set_yticks([])
 
 # 애니메이션 업데이트 함수
 def update(i):
-    im11.set_data(production_index_values[i]-production_index_values[14])  # 프레임에 맞는 데이터로 업데이트
+    im11.set_data(production_index_values[i]-production_index_values[24])  # 프레임에 맞는 데이터로 업데이트
     axs.set_title(f'Year {i + 1991} - Production Index', fontsize=24)  # 제목 업데이트
 
 # 애니메이션 생성

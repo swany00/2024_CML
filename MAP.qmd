@@ -232,12 +232,34 @@ print("출처: FAOSTAT Database.")
 
 ```{python}
 #| title: 경향성분석
+import xarray as xr
+import numpy as np
+import json
+import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
+import requests
+
+# 경향성 분석에 필요한 데이터 로드
 file_path_r95 = '/root/notenotenote/r95_era5_1991-2020.nc'
 file_path_r99 = '/root/notenotenote/r99_era5_1991-2020.nc'
 file_path_rx1day = '/root/notenotenote/rx1day_era5_1991-2020.nc'
 file_path_rx5day = '/root/notenotenote/rx5day_era5_1991-2020.nc'
 file_path_cwd = '/root/notenotenote/cwd_era5_1991-2020.nc'
 file_path_cdd = '/root/notenotenote/cdd_era5_1991-2020.nc'
+
+# combined_production_index 읽기
+com_product_idx = 'https://github.com/swany00/2024_CML/raw/refs/heads/main/combined_production_index.json'
+com_product_idx = json.loads(requests.get(com_product_idx).text)
+production_index = com_product_idx['data_vars']
+production_index_values = list(production_index.values())[0]['data']
+production_index_values = np.array(production_index_values)
+
+# 총 배출량(백만 톤 CO2eq.)
+emissions = np.array([
+    315.4, 343.4, 378.5, 403.6, 433.8, 470.3, 501.9, 431.4, 469.4, 502.7, 516.0, 
+    538.5, 548.8, 557.0, 561.5, 566.9, 580.2, 593.5, 597.3, 655.1, 683.8, 687.0, 695.7, 
+    690.8, 691.3, 692.4, 709.4, 725.0, 699.2, 654.4
+])
 
 # 데이터 로드
 r95 = xr.open_dataset(file_path_r95, decode_times=False)['r95'].values
@@ -246,10 +268,6 @@ rx1day = xr.open_dataset(file_path_rx1day, decode_times=False)['rx1day'].values
 rx5day = xr.open_dataset(file_path_rx5day, decode_times=False)['rx5day'].values
 cwd = xr.open_dataset(file_path_cwd, decode_times=False)['cwd'].values
 cdd = xr.open_dataset(file_path_cdd, decode_times=False)['cdd'].values
-# 그래프 그리기 함수
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
 
 # 그래프 그리기 함수
 def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx1day, rx5day, emissions):
@@ -259,8 +277,8 @@ def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx
     # x축을 1991년부터 2021년까지 설정
     years = np.arange(1991, 2021)
 
-    # 기준 값 (production_index_values[24]) 계산
-    piv15 = np.nansum(production_index_values[24])
+    # 기준 값 (production_index_values[14]) 계산
+    piv15 = np.nansum(production_index_values[14])
 
     # 각 데이터 항목의 연도별 합계 계산 후 piv15 빼기
     po = [np.nansum(rx1day[i]) for i in range(30)]
@@ -269,7 +287,7 @@ def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx
     cwd_sum = [np.nansum(cwd[i]) for i in range(30)]
     r95_sum = [np.nansum(r95[i]) for i in range(30)]
     r99_sum = [np.nansum(r99[i]) for i in range(30)]
-    production_index_sum = [np.nansum(production_index_values[i]) - piv15 for i in range(30)]
+    production_index_sum = [np.nansum(production_index_values[i])-piv15 for i in range(30)]
 
     # 서브플롯을 키우기 위해서 figsize 설정
     fig, axs = plt.subplots(3, 2, figsize=(25, 20), dpi=80)  # 그래프 크기를 더 크게 설정
@@ -349,8 +367,7 @@ def plot_extreme_rainfall_graphs(production_index_values, cwd, cdd, r95, r99, rx
     ax3.set_ylabel('Emissions (Million tons CO2eq)', fontsize=12)
     ax3.set_title('CO2 Emissions Over Time', fontsize=14)
     ax3.grid(True)
-    ax3.legend()
-
+    ax3
     # 서브플롯 간 간격을 넓히기 위해서 adjust 사용
     plt.subplots_adjust(hspace=0.5, wspace=0.4)  # 서브플롯 간 간격을 넓힘
 
